@@ -1,15 +1,14 @@
-﻿/**
- * Button.jsx — Componente de boton reutilizable de CorpHR.
+/**
+ * Button.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Componente de boton reutilizable de CorpHR.
  *
  * Props:
  *   variante   'primary' | 'secondary' | 'danger' | 'ghost'
  *   size       'md' (default) | 'sm' | 'lg'
- *   cargando   boolean — muestra spinner y deshabilita el boton
- *   fullWidth  boolean — ocupa el 100% del ancho del padre
- *   icono      ReactNode — icono SVG opcional al principio
+ *   cargando   boolean ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â muestra spinner y deshabilita el boton
+ *   fullWidth  boolean ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ocupa el 100% del ancho del padre
+ *   icono      ReactNode ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â icono SVG opcional al principio
  *   + todos los atributos nativos de <button>
  */
-import './Button.css';
 
 export default function Button({
   children,
@@ -40,7 +39,7 @@ export default function Button({
       disabled={cargando || disabled}
       {...rest}
     >
-      {/* Spinner de carga — solo visible cuando cargando=true */}
+      {/* Spinner de carga ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â solo visible cuando cargando=true */}
       {cargando ? (
         <span className="spinner" aria-hidden="true" />
       ) : (

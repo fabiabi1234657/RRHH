@@ -15,8 +15,8 @@ export const useCatalogStore = create((set) => ({
         obtenerPosicionesAPI(),
       ]);
 
-      const departments = departmentsResponse.categories ?? [];
-      const positions = positionsResponse.products ?? [];
+      const departments = departmentsResponse.departments ?? [];
+      const positions = positionsResponse.positions ?? [];
       set({ departments, positions, loading: false });
       return { departments, positions };
     } catch (error) {

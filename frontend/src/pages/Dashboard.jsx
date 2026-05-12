@@ -1,10 +1,10 @@
-﻿/**
- * Dashboard.jsx — Panel principal del administrador.
+/**
+ * Dashboard.jsx - Panel principal del administrador.
  *
  * Obtiene datos reales del backend:
- *  - Total de departamentos (GET /api/categories)
- *  - Total de posiciones    (GET /api/products)
- *  - Perfil del usuario     (GET /api/auth/profile)
+ *  - Departamentos  (GET /api/departamentos)
+ *  - Posiciones/Cargos (GET /api/cargos)
+ *  - Empleados      (GET /api/empleados)
  *
  * Muestra:
  *  - Banner de bienvenida con nombre del usuario y fecha
@@ -16,32 +16,20 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCatalogStore } from '../stores/useCatalogStore';
+import { obtenerEmpleadosAPI } from '../services/api';
 import StatCard from '../components/ui/StatCard';
 import Badge    from '../components/ui/Badge';
-import './Dashboard.css';
 
-/* ── Formatear precio como moneda ── */
-const fmt = (n) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
-
-const fmtCompact = (n) => {
-  if (!n) return '$0';
-  if (n >= 1000000) {
-    const millones = n / 1000000;
-    return `$${millones.toLocaleString('es-CO', { maximumFractionDigits: 1 })} M`;
-  }
-  return fmt(n);
-};
-
-/* ── Formatear fecha larga ── */
+/* -- Formatear fecha larga -- */
 const fmtFecha = () => new Intl.DateTimeFormat('es-CO', {
   weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
 }).format(new Date());
 
-/* ── Iconos SVG inline ── */
+/* -- Iconos SVG inline -- */
 const IcoBuilding  = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>;
 const IcoBriefcase = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M8 7V5a2 2 0 0 1 4 0"/></svg>;
-const IcoSalary    = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
-const IcoStar      = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+const IcoUsers     = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+const IcoActivity  = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>;
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -52,13 +40,19 @@ export default function Dashboard() {
     error,
     fetchCatalogs
   } = useCatalogStore();
+
+  const [totalEmpleados, setTotalEmpleados] = useState(0);
   const [errorLocal, setErrorLocal] = useState('');
 
-  /* ── Cargar datos al montar el componente ── */
+  /* -- Cargar datos al montar el componente -- */
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        await fetchCatalogs();
+        const [, rEmp] = await Promise.all([
+          fetchCatalogs(),
+          obtenerEmpleadosAPI()
+        ]);
+        setTotalEmpleados((rEmp.employees ?? rEmp ?? []).length);
       } catch (err) {
         setErrorLocal(err.message || 'Error al cargar los datos');
       }
@@ -66,26 +60,17 @@ export default function Dashboard() {
     cargarDatos();
   }, [fetchCatalogs]);
 
-  /* ── Calculos derivados ── */
-  const salarioPromedio = posiciones.length
-    ? posiciones.reduce((acc, p) => acc + (p.price || 0), 0) / posiciones.length
-    : 0;
-
-  const posicionTopSalario = posiciones.length
-    ? posiciones.reduce((max, p) => p.price > max.price ? p : max, posiciones[0])
-    : null;
-
+  /* -- Calculos derivados -- */
   const recientes = [...posiciones].slice(0, 5);
 
   const deptosConConteo = departamentos.map(dep => ({
     ...dep,
-    totalPosiciones: posiciones.filter(
-      p => p.categoryId?._id === dep._id || p.categoryId === dep._id
+    totalCargos: posiciones.filter(
+      p => (typeof p.department === 'object' ? p.department?._id : p.department) === dep._id
     ).length,
   }));
 
-  /* Maximo de posiciones por departamento (para calcular barras de proporcion) */
-  const maxPosiciones = Math.max(...deptosConConteo.map(d => d.totalPosiciones), 1);
+  const maxCargos = Math.max(...deptosConConteo.map(d => d.totalCargos), 1);
 
   /* Obtener primer nombre del usuario */
   const primerNombre = user?.name?.split(' ')[0] || 'Administrador';
@@ -106,7 +91,7 @@ export default function Dashboard() {
   return (
     <div className="dash fade-in">
 
-      {/* ── Banner de bienvenida ── */}
+      {/* -- Banner de bienvenida -- */}
       <div className="dash__welcome">
         <div className="dash__welcome-left">
           <p className="dash__welcome-caption">Panel de control</p>
@@ -121,10 +106,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Mensaje de error ── */}
-      {(error || errorLocal) && <div className="alert alert--error" style={{ marginBottom: 20 }}>{error || errorLocal}</div>}
+      {/* -- Mensaje de error -- */}
+      {(error || errorLocal) && (
+        <div className="alert alert--error" style={{ marginBottom: 20 }}>{error || errorLocal}</div>
+      )}
 
-      {/* ── Tarjetas de estadisticas ── */}
+      {/* -- Tarjetas de estadisticas -- */}
       <div className="dash__stats">
         <StatCard
           icono={<IcoBuilding />}
@@ -135,67 +122,67 @@ export default function Dashboard() {
         <StatCard
           icono={<IcoBriefcase />}
           valor={posiciones.length}
-          etiqueta="Posiciones registradas"
+          etiqueta="Cargos registrados"
           color="green"
         />
         <StatCard
-          icono={<IcoSalary />}
-          valor={fmtCompact(salarioPromedio)}
-          etiqueta="Salario promedio"
+          icono={<IcoUsers />}
+          valor={totalEmpleados}
+          etiqueta="Empleados activos"
           color="orange"
         />
         <StatCard
-          icono={<IcoStar />}
-          valor={posicionTopSalario?.name || '—'}
-          etiqueta="Posición mejor remunerada"
+          icono={<IcoActivity />}
+          valor={departamentos.length > 0 ? `${Math.round((posiciones.length / Math.max(departamentos.length, 1)) * 10) / 10}` : '0'}
+          etiqueta="Cargos por departamento"
           color="purple"
         />
       </div>
 
-      {/* ── Layout de dos columnas ── */}
+      {/* -- Layout de dos columnas -- */}
       <div className="dash__cols">
 
         {/* Columna izquierda: tabla de posiciones recientes */}
         <div className="card">
           <div className="card__header">
             <div className="card__header-left">
-              <h3 className="card__title">Posiciones Recientes</h3>
+              <h3 className="card__title">Cargos recientes</h3>
               <span className="card__count">{posiciones.length} registros</span>
             </div>
-            <Link to="/app/posiciones" className="card__action">Ver todas →</Link>
+            <Link to="/app/posiciones" className="card__action">Ver todos &rarr;</Link>
           </div>
 
           {posiciones.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state__icon" aria-hidden="true">--</div>
-              <p className="empty-state__title">Sin posiciones</p>
-              <p className="empty-state__desc">Agrega posiciones desde la sección Posiciones</p>
+              <p className="empty-state__title">Sin cargos</p>
+              <p className="empty-state__desc">Agrega cargos desde la seccion Posiciones</p>
             </div>
           ) : (
             <div className="table-wrap">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Posición</th>
+                    <th>Cargo</th>
                     <th>Departamento</th>
-                    <th>Salario</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recientes.map(pos => (
-                    <tr key={pos._id}>
-                      <td>
-                        <span className="table__primary">{pos.name}</span>
-                        {pos.description && (
-                          <span className="table__secondary">{pos.description.slice(0, 40)}...</span>
-                        )}
-                      </td>
-                      <td>
-                        <Badge texto={pos.categoryId?.name || 'Sin depto'} tipo="blue" />
-                      </td>
-                      <td className="table__mono">{fmt(pos.price)}</td>
-                    </tr>
-                  ))}
+                  {recientes.map(pos => {
+                    const deptNombre = typeof pos.department === 'object'
+                      ? pos.department?.name
+                      : departamentos.find(d => d._id === pos.department)?.name;
+                    return (
+                      <tr key={pos._id}>
+                        <td>
+                          <span className="table__primary">{pos.title}</span>
+                        </td>
+                        <td>
+                          <Badge texto={deptNombre || 'Sin depto'} tipo="blue" />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -209,14 +196,14 @@ export default function Dashboard() {
               <h3 className="card__title">Departamentos</h3>
               <span className="card__count">{departamentos.length} activos</span>
             </div>
-            <Link to="/app/departamentos" className="card__action">Gestionar →</Link>
+            <Link to="/app/departamentos" className="card__action">Gestionar &rarr;</Link>
           </div>
 
           {departamentos.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state__icon" aria-hidden="true">--</div>
               <p className="empty-state__title">Sin departamentos</p>
-              <p className="empty-state__desc">Crea departamentos desde la sección correspondiente</p>
+              <p className="empty-state__desc">Crea departamentos desde la seccion correspondiente</p>
             </div>
           ) : (
             <div className="dash__dept-list">
@@ -225,13 +212,13 @@ export default function Dashboard() {
                   <div className="dash__dept-info">
                     <div className="dash__dept-row">
                       <span className="dash__dept-name">{dep.name}</span>
-                      <span className="dash__dept-count">{dep.totalPosiciones} pos.</span>
+                      <span className="dash__dept-count">{dep.totalCargos} cargo{dep.totalCargos !== 1 ? 's' : ''}</span>
                     </div>
                     {/* Barra de proporcion visual */}
                     <div className="dash__dept-bar-track">
                       <div
                         className="dash__dept-bar-fill"
-                        style={{ width: `${(dep.totalPosiciones / maxPosiciones) * 100}%` }}
+                        style={{ width: `${(dep.totalCargos / maxCargos) * 100}%` }}
                       />
                     </div>
                     {dep.description && (

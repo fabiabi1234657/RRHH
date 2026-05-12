@@ -1,5 +1,5 @@
-﻿/**
- * Sidebar.jsx — Barra lateral de navegacion principal de CorpHR.
+/**
+ * Sidebar.jsx - Barra lateral de navegacion principal de CorpHR.
  *
  * Contiene:
  *  - Logo y nombre de la aplicacion
@@ -11,9 +11,8 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from '../../stores/useToastStore';
-import './Sidebar.css';
 
-/* ── Iconos SVG inline (sin dependencias externas) ── */
+/* -- Iconos SVG inline (sin dependencias externas) -- */
 const IcoDashboard  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>;
 const IcoBriefcase  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg>;
 const IcoBuilding   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 9h1m-1 4h1m4-4h1m-1 4h1"/></svg>;
@@ -25,15 +24,16 @@ const IcoLogout     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill
 const IcoUserPlus   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>;
 const IcoDownload   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 
-/* ── Definicion de los items de navegacion por seccion ── */
+/* -- Definicion de los items de navegacion por seccion -- */
 const navAdmin = [
-  { to: '/app/dashboard',    label: 'Dashboard',     Icon: IcoDashboard },
-  { to: '/app/posiciones',   label: 'Posiciones',    Icon: IcoBriefcase },
-  { to: '/app/departamentos',label: 'Departamentos', Icon: IcoBuilding  },
-  { to: '/app/asistencia',   label: 'Asistencia',    Icon: IcoCalendar  },
-  { to: '/app/reportes',     label: 'Reportes',      Icon: IcoChart     },
-  { to: '/app/generar-reportes', label: 'Generar Reportes', Icon: IcoDownload },
-  { to: '/app/registro',     label: 'Registrar usuario', Icon: IcoUserPlus },
+  { to: '/app/dashboard',         label: 'Dashboard',           Icon: IcoDashboard },
+  { to: '/app/empleados',         label: 'Empleados',           Icon: IcoUser      },
+  { to: '/app/posiciones',        label: 'Posiciones',          Icon: IcoBriefcase },
+  { to: '/app/departamentos',     label: 'Departamentos',       Icon: IcoBuilding  },
+  { to: '/app/asistencia',        label: 'Asistencia',          Icon: IcoCalendar  },
+  { to: '/app/reportes',          label: 'Reportes',            Icon: IcoChart     },
+  { to: '/app/generar-reportes',  label: 'Generar Reportes',    Icon: IcoDownload  },
+  { to: '/app/registro',          label: 'Registrar usuario',   Icon: IcoUserPlus  },
 ];
 
 const navEmpleado = [
@@ -53,7 +53,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
   /* Manejar el cierre de sesion con redireccion al login */
   const manejarLogout = async () => {
     await logout();
-    toast.info('Sesión cerrada', 'Hasta pronto.');
+    toast.info('Sesion cerrada', 'Hasta pronto.');
     onClose();
     navigate('/login', { replace: true });
   };
@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
   return (
     <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
 
-      {/* ── Logo y nombre de la aplicacion ── */}
+      {/* -- Logo y nombre de la aplicacion -- */}
       <div className="sidebar__brand">
         <div className="sidebar__logo">
           <span className="sidebar__logo-mark">C</span>
@@ -75,12 +75,12 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         </div>
       </div>
 
-      {/* ── Etiqueta de seccion ── */}
+      {/* -- Etiqueta de seccion -- */}
       <p className="sidebar__section-label">
-        {esAdmin() ? 'Administración' : 'Mi Espacio'}
+        {esAdmin() ? 'Administracion' : 'Mi Espacio'}
       </p>
 
-      {/* ── Menu de navegacion ── */}
+      {/* -- Menu de navegacion -- */}
       <nav className="sidebar__nav">
         {items.map((item) => (
           <NavLink
@@ -103,7 +103,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
       {/* Separador entre el menu y el pie */}
       <div className="sidebar__spacer" />
 
-      {/* ── Pie del sidebar: info del usuario + logout ── */}
+      {/* -- Pie del sidebar: info del usuario + logout -- */}
       <div className="sidebar__footer">
         {/* Avatar con iniciales */}
         <div className="sidebar__avatar">{iniciales}</div>
@@ -120,8 +120,8 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         <button
           className="sidebar__logout"
           onClick={manejarLogout}
-          title="Cerrar sesión"
-          aria-label="Cerrar sesión"
+          title="Cerrar sesion"
+          aria-label="Cerrar sesion"
         >
           <IcoLogout />
         </button>

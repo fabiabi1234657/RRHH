@@ -15,8 +15,8 @@ export const usePositionStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await obtenerPosicionesAPI();
-      set({ positions: data.products ?? [], loading: false });
-      return data.products ?? [];
+      set({ positions: data.positions ?? [], loading: false });
+      return data.positions ?? [];
     } catch (error) {
       set({ error: error.message, loading: false });
       throw error;

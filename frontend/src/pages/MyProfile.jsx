@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { obtenerPerfilAPI, actualizarPerfilAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import Avatar from '../components/ui/Avatar';
@@ -7,9 +7,8 @@ import Alert  from '../components/ui/Alert';
 import Modal  from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import { toast } from '../stores/useToastStore';
-import './MyProfile.css';
 
-/* ── Icono de usuario ── */
+/* -- Icono de usuario -- */
 const IcoUser = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -17,7 +16,7 @@ const IcoUser = () => (
   </svg>
 );
 
-/* ── Icono de sobre (email) ── */
+/* -- Icono de sobre (email) -- */
 const IcoMail = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -25,14 +24,14 @@ const IcoMail = () => (
   </svg>
 );
 
-/* ── Icono de escudo (rol) ── */
+/* -- Icono de escudo (rol) -- */
 const IcoShield = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
   </svg>
 );
 
-/* ── Icono de calendario ── */
+/* -- Icono de calendario -- */
 const IcoCalendar = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -41,7 +40,7 @@ const IcoCalendar = () => (
   </svg>
 );
 
-/* ── Fila de informacion del perfil ── */
+/* -- Fila de informacion del perfil -- */
 function FilaPerfil({ icono, etiqueta, valor }) {
   return (
     <div className="perfil__fila">
@@ -113,7 +112,7 @@ export default function MyProfile() {
   const guardarPerfil = async () => {
     setErrorModal('');
     if (!nombreEdicion.trim()) {
-      setErrorModal('El nombre no puede estar vacío.');
+      setErrorModal('El nombre no puede estar vacio.');
       return;
     }
 
@@ -138,20 +137,20 @@ export default function MyProfile() {
     }
   };
 
-  /* ── Formateador de fecha en espanol ── */
+  /* -- Formateador de fecha en espanol -- */
   const fecha = iso => iso
     ? new Date(iso).toLocaleDateString('es-CO', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       })
-    : '—';
+    : '-';
 
-  /* ── Etiqueta legible del rol ── */
+  /* -- Etiqueta legible del rol -- */
   const etiquetaRol = rol => ({
     admin: 'Administrador',
     employee: 'Empleado'
-  }[rol] ?? rol ?? '—');
+  }[rol] ?? rol ?? '-');
 
-  /* ── Color del badge segun rol ── */
+  /* -- Color del badge segun rol -- */
   const colorRol = rol => rol === 'admin' ? 'purple' : 'blue';
 
   /* Iniciales para el avatar */
@@ -167,7 +166,7 @@ export default function MyProfile() {
         <Alert tipo="success" onCerrar={() => setExito('')}>{exito}</Alert>
       )}
 
-      {/* ── Skeleton de carga ── */}
+      {/* -- Skeleton de carga -- */}
       {cargando && (
         <div className="perfil__card card">
           <div className="perfil__header-skeleton">
@@ -190,12 +189,12 @@ export default function MyProfile() {
         </div>
       )}
 
-      {/* ── Error ── */}
+      {/* -- Error -- */}
       {!cargando && error && (
         <Alert tipo="error">{error}</Alert>
       )}
 
-      {/* ── Tarjeta de perfil ── */}
+      {/* -- Tarjeta de perfil -- */}
       {!cargando && !error && usuario && (
         <>
           {/* Seccion superior: avatar + nombre + rol */}
@@ -234,7 +233,7 @@ export default function MyProfile() {
               />
               <FilaPerfil
                 icono={<IcoMail />}
-                etiqueta="Correo electrónico"
+                etiqueta="Correo electronico"
                 valor={usuario.email}
               />
               <FilaPerfil
@@ -279,7 +278,7 @@ export default function MyProfile() {
             </div>
 
             <div className="field">
-              <label htmlFor="perfil-password" className="field__label">Nueva contraseña</label>
+              <label htmlFor="perfil-password" className="field__label">Nueva contrasena</label>
               <div className="field__input-wrap">
                 <input
                   id="perfil-password"
@@ -288,13 +287,13 @@ export default function MyProfile() {
                   value={passwordEdicion}
                   onChange={(e) => setPasswordEdicion(e.target.value)}
                   autoComplete="new-password"
-                  placeholder="Dejar vacío para no cambiar"
+                  placeholder="Dejar vacio para no cambiar"
                 />
                 <button
                   type="button"
                   className="field__eye"
                   onClick={() => setVerPassword((v) => !v)}
-                  aria-label={verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-label={verPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
                 >
                   {verPassword ? (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>

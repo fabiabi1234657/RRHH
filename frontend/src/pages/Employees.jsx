@@ -1,14 +1,12 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { obtenerDepartamentosAPI } from '../services/api';
 import { usePositionStore } from '../stores/usePositionStore';
-import Modal   from '../components/ui/Modal';
-import Button  from '../components/ui/Button';
-import Badge   from '../components/ui/Badge';
-import Alert   from '../components/ui/Alert';
+import Modal  from '../components/ui/Modal';
+import Button from '../components/ui/Button';
+import Badge  from '../components/ui/Badge';
+import Alert  from '../components/ui/Alert';
 import { toast } from '../stores/useToastStore';
-import './Employees.css';
 
-/* ── Icono de lapiz ── */
 const IcoEdit = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -16,116 +14,75 @@ const IcoEdit = () => (
   </svg>
 );
 
-/* ── Icono de papelera ── */
 const IcoDelete = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+    <polyline points="3 6 5 6 21 6"/>
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
     <path d="M10 11v6"/><path d="M14 11v6"/>
     <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
   </svg>
 );
 
-/* ── Icono de busqueda ── */
 const IcoSearch = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    <circle cx="11" cy="11" r="8"/>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
   </svg>
 );
 
-/* ── Icono de mas ── */
 const IcoPlus = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    <line x1="12" y1="5" x2="12" y2="19"/>
+    <line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
 );
 
-/* ── Formateador de salario en pesos colombianos ── */
-const formatSalario = v => {
-  const n = Number(v);
-  if (isNaN(n)) return '—';
-  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(n);
-};
-
-/* ── Colores ciclicos para badge de departamento ── */
 const DEPT_TYPES = ['blue', 'purple', 'orange', 'green', 'info'];
 const deptColor = name => {
   const code = [...(name ?? '')].reduce((a, c) => a + c.charCodeAt(0), 0);
   return DEPT_TYPES[code % DEPT_TYPES.length];
 };
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    Formulario para crear / editar una posicion (cargo)
-   Los campos siguen el modelo Product del backend:
-     - name (titulo del cargo)
-     - description (descripcion del cargo)
-     - price (salario mensual)
-     - categoryId (departamento al que pertenece)
-   ══════════════════════════════════════════════════════════ */
+   Modelo Position del backend:
+     - title (string, required)
+     - department (ObjectId ref Department, required)
+   ---------------------------------------------------------- */
 function FormPosicion({ inicial, departamentos, guardando, error, onGuardar, onCerrarError }) {
-  /* Estado del formulario */
-  const [form, setForm] = useState({
-    nombre: '', descripcion: '', salario: '', departamentoId: '',
-    ...inicial
-  });
-
+  const [form, setForm] = useState({ titulo: '', departamentoId: '', ...inicial });
   const cambiar = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  /* Validacion local antes de enviar al backend */
   const enviar = e => {
     e.preventDefault();
-    if (!form.nombre.trim()) return;
-    /* El backend requiere categoryId obligatorio y valido */
-    if (!form.departamentoId) return;
+    if (!form.titulo.trim() || !form.departamentoId) return;
     onGuardar(form);
   };
 
   return (
     <form className="pos-form" onSubmit={enviar}>
-      {/* Error del servidor */}
       {error && <Alert tipo="error" onCerrar={onCerrarError}>{error}</Alert>}
 
-      {/* Nombre del cargo */}
       <div className="field">
-        <label className="field__label" htmlFor="pf-nombre">Titulo del cargo *</label>
-        <input id="pf-nombre" name="nombre" className="field__input"
-          placeholder="Ej. Desarrollador Senior" value={form.nombre} onChange={cambiar} required />
+        <label className="field__label" htmlFor="pf-titulo">Titulo del cargo *</label>
+        <input id="pf-titulo" name="titulo" className="field__input"
+          placeholder="Ej. Desarrollador Senior" value={form.titulo} onChange={cambiar} required />
       </div>
 
-      {/* Departamento (select obligatorio — backend requiere categoryId valido) */}
       <div className="field">
         <label className="field__label" htmlFor="pf-dept">Departamento *</label>
         <select id="pf-dept" name="departamentoId" className="field__input field__select"
           value={form.departamentoId} onChange={cambiar} required>
-          <option value="">— Selecciona un departamento —</option>
+          <option value="">- Selecciona un departamento -</option>
           {departamentos.map(d => (
             <option key={d._id} value={d._id}>{d.name}</option>
           ))}
         </select>
-        {!form.departamentoId && <span className="field__hint">Requerido para crear la posición</span>}
       </div>
 
-      {/* Grid de dos columnas: salario e informacion adicional */}
-      <div className="pos-form__row">
-        {/* Salario (precio en el modelo Product) */}
-        <div className="field">
-          <label className="field__label" htmlFor="pf-salario">Salario mensual (COP)</label>
-          <input id="pf-salario" name="salario" type="number" min="0" className="field__input"
-            placeholder="3500000" value={form.salario} onChange={cambiar} />
-        </div>
-      </div>
-
-      {/* Descripcion del cargo */}
-      <div className="field">
-        <label className="field__label" htmlFor="pf-desc">Descripcion del cargo</label>
-        <textarea id="pf-desc" name="descripcion" className="field__input field__textarea"
-          placeholder="Describe las responsabilidades de esta posición..." rows={3}
-          value={form.descripcion} onChange={cambiar} />
-      </div>
-
-      {/* Boton guardar */}
       <div className="pos-form__footer">
         <Button type="submit" variante="primary" cargando={guardando} fullWidth>
-          {inicial?._id ? 'Guardar cambios' : 'Crear posición'}
+          {inicial?._id ? 'Guardar cambios' : 'Crear posicion'}
         </Button>
       </div>
     </form>
@@ -134,10 +91,8 @@ function FormPosicion({ inicial, departamentos, guardando, error, onGuardar, onC
 
 /* ================================================================
    Pagina principal: Posiciones / Cargos
-   Conectado al endpoint real /api/products
-   - name = titulo del cargo
-   - price = salario mensual
-   - categoryId = departamento (ref a Category)
+   Endpoint: /api/cargos
+   Modelo: { title, department }
    ================================================================ */
 export default function Employees() {
   const {
@@ -150,150 +105,111 @@ export default function Employees() {
     deletePosition,
     clearPositionError
   } = usePositionStore();
-  /* Lista de departamentos para el select */
-  const [departamentos, setDepartamentos] = useState([]);
-  /* Texto de busqueda */
-  const [busqueda, setBusqueda] = useState('');
 
-  /* Control de modales */
+  const [departamentos, setDepartamentos] = useState([]);
+  const [busqueda, setBusqueda] = useState('');
   const [modalCrear, setModalCrear] = useState(false);
   const [editando, setEditando]     = useState(null);
   const [eliminando, setEliminando] = useState(null);
+  const [guardando, setGuardando]   = useState(false);
+  const [errorAccion, setErrorAccion] = useState(null);
 
-  /* Estado de operaciones */
-  const [guardando, setGuardando]       = useState(false);
-  const [errorAccion, setErrorAccion]   = useState(null);
-
-  /* ── Carga paralela: posiciones + departamentos ── */
   const cargar = useCallback(async () => {
     try {
       const [, rDept] = await Promise.all([
         fetchPositions(),
         obtenerDepartamentosAPI()
       ]);
-      setDepartamentos(rDept.categories ?? []);
+      setDepartamentos(rDept.departments ?? []);
     } catch {
       /* El store conserva el error de posiciones para la UI. */
     }
   }, [fetchPositions]);
 
-  useEffect(() => {
-    void Promise.resolve().then(cargar);
-  }, [cargar]);
+  useEffect(() => { void Promise.resolve().then(cargar); }, [cargar]);
 
-  /* ── Filtro de busqueda local ── */
   const filtradas = posiciones.filter(p => {
     const q = busqueda.toLowerCase();
+    const dept = typeof p.department === 'object' ? p.department?.name : '';
     return (
-      p.name?.toLowerCase().includes(q) ||
-      p.description?.toLowerCase().includes(q) ||
-      p.categoryId?.name?.toLowerCase().includes(q)
+      p.title?.toLowerCase().includes(q) ||
+      dept?.toLowerCase().includes(q)
     );
   });
 
-  /* ── Crear nueva posicion ── */
-  const crearPosicion = async ({ nombre, descripcion, salario, departamentoId }) => {
-    setGuardando(true);
-    setErrorAccion(null);
+  const crearPosicion = async ({ titulo, departamentoId }) => {
+    setGuardando(true); setErrorAccion(null);
     try {
-      await createPosition({
-        name: nombre,
-        description: descripcion,
-        price: salario !== '' ? Number(salario) : 0,
-        categoryId: departamentoId || undefined
-      });
+      await createPosition({ title: titulo, department: departamentoId });
       setModalCrear(false);
-      toast.success('Posición creada', `"${nombre}" fue creada correctamente.`);
+      toast.success('Posicion creada', `"${titulo}" fue creada correctamente.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al crear');
-      toast.error('Error al crear', e.message ?? 'No se pudo crear la posición.');
-    } finally {
-      setGuardando(false);
-    }
+      toast.error('Error al crear', e.message ?? 'No se pudo crear la posicion.');
+    } finally { setGuardando(false); }
   };
 
-  /* ── Actualizar posicion existente ── */
-  const actualizarPosicion = async ({ nombre, descripcion, salario, departamentoId }) => {
-    setGuardando(true);
-    setErrorAccion(null);
+  const actualizarPosicion = async ({ titulo, departamentoId }) => {
+    setGuardando(true); setErrorAccion(null);
     try {
-      await updatePosition(editando._id, {
-        name: nombre,
-        description: descripcion,
-        price: salario !== '' ? Number(salario) : 0,
-        categoryId: departamentoId || undefined
-      });
+      await updatePosition(editando._id, { title: titulo, department: departamentoId });
       setEditando(null);
-      toast.success('Posición actualizada', `"${nombre}" fue actualizada correctamente.`);
+      toast.success('Posicion actualizada', `"${titulo}" fue actualizada correctamente.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al actualizar');
-      toast.error('Error al actualizar', e.message ?? 'No se pudo actualizar la posición.');
-    } finally {
-      setGuardando(false);
-    }
+      toast.error('Error al actualizar', e.message ?? 'No se pudo actualizar la posicion.');
+    } finally { setGuardando(false); }
   };
 
-  /* ── Confirmar y ejecutar eliminacion ── */
   const confirmarEliminar = async () => {
-    setGuardando(true);
-    setErrorAccion(null);
+    setGuardando(true); setErrorAccion(null);
     try {
-      const nombre = eliminando.name;
+      const titulo = eliminando.title;
       await deletePosition(eliminando._id);
       setEliminando(null);
-      toast.success('Posición eliminada', `"${nombre}" fue eliminada.`);
+      toast.success('Posicion eliminada', `"${titulo}" fue eliminada.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al eliminar');
-      toast.error('Error al eliminar', e.message ?? 'No se pudo eliminar la posición.');
-    } finally {
-      setGuardando(false);
-    }
+      toast.error('Error al eliminar', e.message ?? 'No se pudo eliminar la posicion.');
+    } finally { setGuardando(false); }
   };
 
-  /* ── Formateador de fecha ── */
   const fecha = iso => iso
     ? new Date(iso).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' })
-    : '—';
+    : '-';
 
-  /* ── Prepara valores iniciales para el modal de edicion ── */
   const inicialEdicion = p => ({
     _id: p._id,
-    nombre: p.name ?? '',
-    descripcion: p.description ?? '',
-    salario: p.price ?? '',
-    departamentoId: typeof p.categoryId === 'object' ? p.categoryId?._id : p.categoryId ?? ''
+    titulo: p.title ?? '',
+    departamentoId: typeof p.department === 'object' ? p.department?._id : p.department ?? ''
   });
 
   return (
     <div className="posiciones">
-
-      {/* ── Encabezado ── */}
       <div className="page-header">
         <div className="page-header__left">
-          <h1 className="page-header__title">Catálogo de cargos</h1>
-          <p className="page-header__desc">Responsabilidades, salarios y áreas vinculadas</p>
+          <h1 className="page-header__title">Catalogo de cargos</h1>
+          <p className="page-header__desc">Responsabilidades y areas vinculadas</p>
         </div>
         <Button variante="primary" icono={<IcoPlus />}
           onClick={() => { setErrorAccion(null); setModalCrear(true); }}>
-          Nueva posición
+          Nueva posicion
         </Button>
       </div>
 
-      {/* ── Barra de busqueda ── */}
       <div className="dept-toolbar">
         <div className="search-bar">
           <span className="search-bar__icon"><IcoSearch /></span>
-          <input className="search-bar__input" placeholder="Buscar por cargo, departamento..."
+          <input className="search-bar__input" placeholder="Buscar por cargo o departamento..."
             value={busqueda} onChange={e => setBusqueda(e.target.value)} />
         </div>
         {!cargando && (
           <span className="dept-count">
-            {filtradas.length} {filtradas.length === 1 ? 'posición' : 'posiciones'}
+            {filtradas.length} {filtradas.length === 1 ? 'posicion' : 'posiciones'}
           </span>
         )}
       </div>
 
-      {/* ── Skeleton de carga ── */}
       {cargando && (
         <div className="card">
           <div className="dept-skeleton">
@@ -307,12 +223,10 @@ export default function Employees() {
         </div>
       )}
 
-      {/* ── Error general ── */}
       {!cargando && error && (
         <Alert tipo="error" onCerrar={clearPositionError}>{error}</Alert>
       )}
 
-      {/* ── Tabla de posiciones ── */}
       {!cargando && !error && (
         <div className="card">
           {filtradas.length === 0 ? (
@@ -322,9 +236,7 @@ export default function Employees() {
                 {busqueda ? 'Sin resultados' : 'No hay posiciones'}
               </p>
               <p className="empty-state__desc">
-                {busqueda
-                  ? `No se encontro "${busqueda}"`
-                  : 'Crea la primera posición para comenzar.'}
+                {busqueda ? `No se encontro "${busqueda}"` : 'Crea la primera posicion para comenzar.'}
               </p>
             </div>
           ) : (
@@ -334,58 +246,42 @@ export default function Employees() {
                   <tr>
                     <th>Cargo</th>
                     <th>Departamento</th>
-                    <th>Salario mensual</th>
                     <th>Creado</th>
                     <th style={{ textAlign: 'right' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtradas.map(pos => (
-                    <tr key={pos._id}>
-                      {/* Nombre del cargo */}
-                      <td>
-                        <span className="table__primary">{pos.name}</span>
-                        {pos.description && (
-                          <span className="table__secondary pos-desc">{pos.description}</span>
-                        )}
-                      </td>
-
-                      {/* Departamento (badge) */}
-                      <td>
-                        {pos.categoryId
-                          ? <Badge
-                              texto={pos.categoryId?.name ?? pos.categoryId}
-                              tipo={deptColor(pos.categoryId?.name ?? pos.categoryId)}
-                            />
-                          : <span style={{ color: 'var(--text3)', fontSize: 13 }}>—</span>
-                        }
-                      </td>
-
-                      {/* Salario formateado */}
-                      <td>
-                        <span className="table__mono pos-salary">
-                          {pos.price != null ? formatSalario(pos.price) : '—'}
-                        </span>
-                      </td>
-
-                      {/* Fecha creacion */}
-                      <td><span className="table__secondary">{fecha(pos.createdAt)}</span></td>
-
-                      {/* Acciones */}
-                      <td>
-                        <div className="table__actions" style={{ justifyContent: 'flex-end' }}>
-                          <button className="table__btn table__btn--edit" title="Editar"
-                            onClick={() => { setErrorAccion(null); setEditando(pos); }}>
-                            <IcoEdit />
-                          </button>
-                          <button className="table__btn table__btn--delete" title="Eliminar"
-                            onClick={() => { setErrorAccion(null); setEliminando(pos); }}>
-                            <IcoDelete />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filtradas.map(pos => {
+                    const deptName = typeof pos.department === 'object'
+                      ? pos.department?.name
+                      : departamentos.find(d => d._id === pos.department)?.name;
+                    return (
+                      <tr key={pos._id}>
+                        <td>
+                          <span className="table__primary">{pos.title}</span>
+                        </td>
+                        <td>
+                          {deptName
+                            ? <Badge texto={deptName} tipo={deptColor(deptName)} />
+                            : <span style={{ color: 'var(--text3)', fontSize: 13 }}>-</span>
+                          }
+                        </td>
+                        <td><span className="table__secondary">{fecha(pos.createdAt)}</span></td>
+                        <td>
+                          <div className="table__actions" style={{ justifyContent: 'flex-end' }}>
+                            <button className="table__btn table__btn--edit" title="Editar"
+                              onClick={() => { setErrorAccion(null); setEditando(pos); }}>
+                              <IcoEdit />
+                            </button>
+                            <button className="table__btn table__btn--delete" title="Eliminar"
+                              onClick={() => { setErrorAccion(null); setEliminando(pos); }}>
+                              <IcoDelete />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -393,9 +289,8 @@ export default function Employees() {
         </div>
       )}
 
-      {/* ══ Modal: Crear posicion ══ */}
       {modalCrear && (
-        <Modal titulo="Nueva posición" onClose={() => setModalCrear(false)}>
+        <Modal titulo="Nueva posicion" onClose={() => setModalCrear(false)}>
           <FormPosicion
             departamentos={departamentos}
             guardando={guardando}
@@ -406,9 +301,8 @@ export default function Employees() {
         </Modal>
       )}
 
-      {/* ══ Modal: Editar posicion ══ */}
       {editando && (
-        <Modal titulo="Editar posición" onClose={() => setEditando(null)}>
+        <Modal titulo="Editar posicion" onClose={() => setEditando(null)}>
           <FormPosicion
             inicial={inicialEdicion(editando)}
             departamentos={departamentos}
@@ -420,10 +314,9 @@ export default function Employees() {
         </Modal>
       )}
 
-      {/* ══ Modal: Confirmar eliminacion ══ */}
       {eliminando && (
         <Modal
-          titulo="Eliminar posición"
+          titulo="Eliminar posicion"
           onClose={() => setEliminando(null)}
           footer={
             <>
@@ -434,7 +327,7 @@ export default function Employees() {
         >
           <div className="dept-confirm">
             {errorAccion && <Alert tipo="error" onCerrar={() => setErrorAccion(null)}>{errorAccion}</Alert>}
-            <p>?Esta seguro de eliminar el cargo <strong>{eliminando.name}</strong>?</p>
+            <p>Esta seguro de eliminar el cargo <strong>{eliminando.title}</strong>?</p>
             <p className="dept-confirm__warn">Esta accion no se puede deshacer.</p>
           </div>
         </Modal>

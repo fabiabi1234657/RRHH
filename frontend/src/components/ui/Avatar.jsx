@@ -1,12 +1,11 @@
-﻿/**
- * Avatar.jsx — Avatar circular con iniciales para CorpHR.
+/**
+ * Avatar.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Avatar circular con iniciales para CorpHR.
  *
  * Props:
- *   iniciales  string — 1-2 letras a mostrar
+ *   iniciales  string ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â 1-2 letras a mostrar
  *   size       'xs'|'sm'|'md'|'lg'|'xl'
- *   gradiente  string — clase CSS para el gradiente de fondo
+ *   gradiente  string ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â clase CSS para el gradiente de fondo
  */
-import './Avatar.css';
 
 /* Gradientes predefinidos para asignar a usuarios */
 const GRADIENTES = [

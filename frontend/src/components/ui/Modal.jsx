@@ -1,15 +1,14 @@
-﻿/**
- * Modal.jsx — Ventana modal reutilizable de CorpHR.
+/**
+ * Modal.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Ventana modal reutilizable de CorpHR.
  *
  * Props:
- *   titulo    string  — titulo del encabezado
- *   onClose   fn      — callback al cerrar (X o backdrop o Escape)
- *   children  node    — contenido del cuerpo del modal
- *   ancho     string  — CSS max-width (default: '520px')
- *   footer    node    — contenido del pie del modal (botones)
+ *   titulo    string  ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â titulo del encabezado
+ *   onClose   fn      ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â callback al cerrar (X o backdrop o Escape)
+ *   children  node    ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â contenido del cuerpo del modal
+ *   ancho     string  ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â CSS max-width (default: '520px')
+ *   footer    node    ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â contenido del pie del modal (botones)
  */
 import { useEffect } from 'react';
-import './Modal.css';
 
 export default function Modal({
   titulo,
@@ -18,7 +17,7 @@ export default function Modal({
   ancho  = '520px',
   footer = null,
 }) {
-  /* ── Cerrar con la tecla Escape ── */
+  /* -- Cerrar con la tecla Escape -- */
   useEffect(() => {
     const manejarTecla = (e) => {
       if (e.key === 'Escape') onClose();
@@ -36,16 +35,16 @@ export default function Modal({
   }, [onClose]);
 
   return (
-    /* Fondo oscuro semitransparente — click fuera cierra el modal */
+    /* Fondo oscuro semitransparente ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â click fuera cierra el modal */
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
 
-      {/* Contenedor del modal — stopPropagation evita cierre al hacer click adentro */}
+      {/* Contenedor del modal ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â stopPropagation evita cierre al hacer click adentro */}
       <div
         className="modal"
         style={{ maxWidth: ancho }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ── Encabezado del modal ── */}
+        {/* -- Encabezado del modal -- */}
         <div className="modal__header">
           <h2 className="modal__title">{titulo}</h2>
 
@@ -63,12 +62,12 @@ export default function Modal({
           </button>
         </div>
 
-        {/* ── Cuerpo del modal: contenido dinamico ── */}
+        {/* -- Cuerpo del modal: contenido dinamico -- */}
         <div className="modal__body">
           {children}
         </div>
 
-        {/* ── Pie del modal con botones de accion (opcional) ── */}
+        {/* -- Pie del modal con botones de accion (opcional) -- */}
         {footer && (
           <div className="modal__footer">
             {footer}
