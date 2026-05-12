@@ -1,18 +1,17 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registrarAPI, registrarAdminAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/ui/Button';
 import Alert  from '../components/ui/Alert';
-import './Register.css';
 
-/* ── Icono ojo para contrasena ── */
-const IcoEye    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
-const IcoEyeOff = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>;
+/* -- Iconos -- */
+const IcoEye      = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
+const IcoEyeOff   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>;
 const IcoUserPlus = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>;
-const IcoShield = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+const IcoShield    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
 const IcoBriefcase = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>;
-const IcoCheck = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+
 
 /* ================================================================
    Pagina: Registrar Usuario
@@ -24,7 +23,7 @@ export default function Register() {
   const { esAdmin, isAuthenticated } = useAuth();
   const puedeAsignarRol = isAuthenticated && esAdmin();
 
-  /* ── Estado del formulario ── */
+  /* -- Estado del formulario -- */
   const [form, setForm] = useState({ nombre: '', email: '', password: '', confirmar: '', rol: 'employee' });
   const [verPass, setVerPass]   = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -36,7 +35,7 @@ export default function Register() {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
   };
 
-  /* ── Envio del formulario al backend ── */
+  /* -- Envio del formulario al backend -- */
   const enviar = async e => {
     e.preventDefault();
     setError('');
@@ -44,11 +43,11 @@ export default function Register() {
 
     /* Validacion local de contrasenas coincidentes */
     if (form.password !== form.confirmar) {
-      setError('Las contraseñas no coinciden. Verifícalas e intenta de nuevo.');
+      setError('Las contrasenas no coinciden. Verificalas e intenta de nuevo.');
       return;
     }
     if (form.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+      setError('La contrasena debe tener al menos 6 caracteres.');
       return;
     }
 
@@ -79,42 +78,19 @@ export default function Register() {
 
   return (
     <div className="registro">
+      <div className="registro__wrap">
+        <div className="card">
 
-      <div className="registro__layout">
-        <aside className="registro__summary card">
-          <span className="registro__eyebrow">Alta de acceso</span>
-          <h2 className="registro__summary-title">Crea usuarios con datos limpios desde el primer paso.</h2>
-          <p className="registro__summary-text">
-            Define el perfil, asigna credenciales y conserva el control de roles para que cada persona vea solo lo necesario.
-          </p>
-          <div className="registro__checklist">
-            <span><IcoCheck /> Correo corporativo o personal</span>
-            <span><IcoCheck /> Contraseña inicial segura</span>
-            <span><IcoCheck /> Rol operativo definido</span>
-          </div>
-        </aside>
-
-        {/* ── Tarjeta del formulario ── */}
-        <section className="registro__card card">
           <div className="registro__card-head">
             <div className="registro__head-icon"><IcoUserPlus /></div>
             <div>
               <h2>Datos de la cuenta</h2>
-              <p>Completa la información básica para habilitar el acceso.</p>
+              <p>Completa la informacion basica para habilitar el acceso.</p>
             </div>
           </div>
 
-          {/* Alertas de resultado */}
-          {exito && (
-            <Alert tipo="success" onCerrar={() => setExito('')} className="registro__alert">
-              {exito}
-            </Alert>
-          )}
-          {error && (
-            <Alert tipo="error" onCerrar={() => setError('')} className="registro__alert">
-              {error}
-            </Alert>
-          )}
+          {exito && <Alert tipo="success" onCerrar={() => setExito('')}>{exito}</Alert>}
+          {error && <Alert tipo="error" onCerrar={() => setError('')}>{error}</Alert>}
 
           <form className="registro__form" onSubmit={enviar} noValidate>
 
@@ -122,13 +98,13 @@ export default function Register() {
           <div className="field">
             <label className="field__label" htmlFor="rg-nombre">Nombre completo *</label>
             <input id="rg-nombre" name="nombre" className="field__input"
-              placeholder="Ej. María González" value={form.nombre}
+              placeholder="Ej. Maria Gonzalez" value={form.nombre}
               onChange={cambiar} required />
           </div>
 
           {/* Email */}
           <div className="field">
-            <label className="field__label" htmlFor="rg-email">Correo electrónico *</label>
+            <label className="field__label" htmlFor="rg-email">Correo electronico *</label>
             <input id="rg-email" name="email" type="email" className="field__input"
               placeholder="usuario@empresa.com" value={form.email}
               onChange={cambiar} required />
@@ -137,7 +113,7 @@ export default function Register() {
           {/* Fila: contrasena + confirmacion */}
           <div className="registro__row">
             <div className="field">
-              <label className="field__label" htmlFor="rg-pass">Contraseña *</label>
+              <label className="field__label" htmlFor="rg-pass">Contrasena *</label>
               <div className="field__input-wrap">
                 <input id="rg-pass" name="password"
                   type={verPass ? 'text' : 'password'}
@@ -151,12 +127,12 @@ export default function Register() {
             </div>
 
             <div className="field">
-              <label className="field__label" htmlFor="rg-confirm">Confirmar contraseña *</label>
+              <label className="field__label" htmlFor="rg-confirm">Confirmar contrasena *</label>
               <div className="field__input-wrap">
                 <input id="rg-confirm" name="confirmar"
                   type={verPass ? 'text' : 'password'}
                   className="field__input"
-                  placeholder="Repite la contraseña"
+                  placeholder="Repite la contrasena"
                   value={form.confirmar} onChange={cambiar} required />
               </div>
             </div>
@@ -172,7 +148,7 @@ export default function Register() {
                 </button>
                 <button type="button" className={`registro__role-card ${form.rol === 'admin' ? 'is-active' : ''}`} onClick={() => setForm(f => ({ ...f, rol: 'admin' }))}>
                   <span className="registro__role-icon"><IcoShield /></span>
-                  <span><strong>Administrador</strong><small>Gestión completa del sistema</small></span>
+                  <span><strong>Administrador</strong><small>Gestion completa del sistema</small></span>
                 </button>
               </div>
               <span className="field__hint">Solo un administrador autenticado puede crear cuentas admin.</span>
@@ -180,23 +156,18 @@ export default function Register() {
           ) : (
             <div className="field">
               <span className="field__hint">
-                El registro público crea una cuenta de empleado. Las cuentas admin se crean desde el panel interno.
+                El registro publico crea una cuenta de empleado. Las cuentas admin se crean desde el panel interno.
               </span>
             </div>
           )}
 
-          {/* Acciones */}
           <div className="registro__footer">
-            <Button type="button" variante="secondary" onClick={() => navigate(-1)}>
-              Cancelar
-            </Button>
-            <Button type="submit" variante="primary" cargando={cargando}>
-              Crear usuario
-            </Button>
+            <Button type="button" variante="secondary" onClick={() => navigate(-1)}>Cancelar</Button>
+            <Button type="submit" variante="primary" cargando={cargando}>Crear usuario</Button>
           </div>
 
           </form>
-        </section>
+        </div>
       </div>
     </div>
   );

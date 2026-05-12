@@ -1,5 +1,5 @@
-﻿/**
- * Alert.jsx — Componente de alerta / mensaje de estado.
+/**
+ * Alert.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Componente de alerta / mensaje de estado.
  *
  * Reemplaza el uso de <div className="alert alert--X"> con un
  * componente consistente que incluye icono SVG, texto y boton
@@ -7,15 +7,14 @@
  *
  * Props:
  *  - tipo     : 'error' | 'success' | 'warning' | 'info'  (default: 'error')
- *  - titulo   : string (opcional) — linea en negrita arriba del mensaje
+ *  - titulo   : string (opcional) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â linea en negrita arriba del mensaje
  *  - children : contenido / mensaje a mostrar
- *  - onCerrar : funcion (opcional) — muestra boton X para descartar
+ *  - onCerrar : funcion (opcional) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â muestra boton X para descartar
  *  - className: clases adicionales
  */
 
-import './Alert.css';
 
-/* ── Iconos SVG por tipo de alerta ── */
+/* -- Iconos SVG por tipo de alerta -- */
 const iconos = {
   error: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -46,7 +45,7 @@ const iconos = {
   ),
 };
 
-/* ── Icono X para cerrar ── */
+/* -- Icono X para cerrar -- */
 const IcoCerrar = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <line x1="18" y1="6" x2="6" y2="18"/>

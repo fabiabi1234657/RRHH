@@ -8,7 +8,6 @@ import {
   obtenerReporteAsistenciaMensualAPI,
   obtenerReporteHeadcountAPI,
 } from '../services/api.js';
-import './GenerateReports.css';
 
 /* ── Iconos ── */
 const IcoPDF = () => (

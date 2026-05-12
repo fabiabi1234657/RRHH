@@ -15,8 +15,8 @@ export const useDepartmentStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await obtenerDepartamentosAPI();
-      set({ departments: data.categories ?? [], loading: false });
-      return data.categories ?? [];
+      set({ departments: data.departments ?? [], loading: false });
+      return data.departments ?? [];
     } catch (error) {
       set({ error: error.message, loading: false });
       throw error;

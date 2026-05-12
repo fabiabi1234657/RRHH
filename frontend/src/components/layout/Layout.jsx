@@ -1,5 +1,5 @@
-﻿/**
- * Layout.jsx — Shell principal de la aplicacion autenticada.
+/**
+ * Layout.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Shell principal de la aplicacion autenticada.
  *
  * Compone el Sidebar fijo, la Topbar fija y el area de contenido
  * donde React Router renderiza la pagina activa via <Outlet />.
@@ -8,7 +8,6 @@ import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Topbar  from './Topbar';
-import './Layout.css';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,7 +31,7 @@ export default function Layout() {
         {/* Barra superior fija con el titulo y controles */}
         <Topbar onMenuClick={() => setSidebarOpen((prev) => !prev)} />
 
-        {/* Area de contenido desplazable — aqui se renderiza cada pagina */}
+        {/* Area de contenido desplazable ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â aqui se renderiza cada pagina */}
         <main className="layout__content fade-in">
           <Outlet />
         </main>

@@ -1,13 +1,12 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDepartmentStore } from '../stores/useDepartmentStore';
 import Modal   from '../components/ui/Modal';
 import Button  from '../components/ui/Button';
 import Badge   from '../components/ui/Badge';
 import Alert   from '../components/ui/Alert';
 import { toast } from '../stores/useToastStore';
-import './Departments.css';
 
-/* ── Icono de lapiz (editar) ── */
+/* -- Icono de lapiz (editar) -- */
 const IcoEdit = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -15,7 +14,7 @@ const IcoEdit = () => (
   </svg>
 );
 
-/* ── Icono de papelera (eliminar) ── */
+/* -- Icono de papelera (eliminar) -- */
 const IcoDelete = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -24,21 +23,21 @@ const IcoDelete = () => (
   </svg>
 );
 
-/* ── Icono de busqueda ── */
+/* -- Icono de busqueda -- */
 const IcoSearch = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
   </svg>
 );
 
-/* ── Icono de mas (crear) ── */
+/* -- Icono de mas (crear) -- */
 const IcoPlus = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
 );
 
-/* ── Formulario de creacion / edicion de departamento ── */
+/* -- Formulario de creacion / edicion de departamento -- */
 function FormDepartamento({ inicial, guardando, error, onGuardar, onCerrarError }) {
   /* Estado inicial del formulario */
   const [form, setForm] = useState({ nombre: '', descripcion: '', ...inicial });
@@ -83,7 +82,7 @@ function FormDepartamento({ inicial, guardando, error, onGuardar, onCerrarError 
 
 /* ================================================================
    Pagina principal: Departamentos
-   Conectado al endpoint real GET/POST/PUT/DELETE /api/categories
+   Conectado al endpoint real GET/POST/PUT/DELETE /api/departamentos
    ================================================================ */
 export default function Departments() {
   const {
@@ -111,7 +110,7 @@ export default function Departments() {
   /* Error de accion (guardar / eliminar) */
   const [errorAccion, setErrorAccion] = useState(null);
 
-  /* ── Carga inicial de departamentos ── */
+  /* -- Carga inicial de departamentos -- */
   const cargar = useCallback(async () => {
     try {
       await fetchDepartments();
@@ -122,13 +121,13 @@ export default function Departments() {
 
   useEffect(() => { cargar(); }, [cargar]);
 
-  /* ── Lista filtrada por busqueda ── */
+  /* -- Lista filtrada por busqueda -- */
   const filtrados = departamentos.filter(d =>
     d.name?.toLowerCase().includes(busqueda.toLowerCase()) ||
     d.description?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  /* ── Guardar nuevo departamento ── */
+  /* -- Guardar nuevo departamento -- */
   const crearDepartamento = async ({ nombre, descripcion }) => {
     setGuardando(true);
     setErrorAccion(null);
@@ -144,7 +143,7 @@ export default function Departments() {
     }
   };
 
-  /* ── Guardar edicion de departamento ── */
+  /* -- Guardar edicion de departamento -- */
   const actualizarDepartamento = async ({ nombre, descripcion }) => {
     setGuardando(true);
     setErrorAccion(null);
@@ -160,7 +159,7 @@ export default function Departments() {
     }
   };
 
-  /* ── Confirmar eliminacion ── */
+  /* -- Confirmar eliminacion -- */
   const confirmarEliminar = async () => {
     setGuardando(true);
     setErrorAccion(null);
@@ -177,26 +176,26 @@ export default function Departments() {
     }
   };
 
-  /* ── Formateador de fecha legible en espanol ── */
+  /* -- Formateador de fecha legible en espanol -- */
   const fecha = iso => iso
     ? new Date(iso).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' })
-    : '—';
+    : '-';
 
   return (
     <div className="departamentos">
 
-      {/* ── Encabezado de la pagina ── */}
+      {/* -- Encabezado de la pagina -- */}
       <div className="page-header">
         <div className="page-header__left">
-          <h1 className="page-header__title">Áreas organizacionales</h1>
-          <p className="page-header__desc">Estructura interna y descripción de cada equipo</p>
+          <h1 className="page-header__title">Areas organizacionales</h1>
+          <p className="page-header__desc">Estructura interna y descripcion de cada equipo</p>
         </div>
         <Button variante="primary" icono={<IcoPlus />} onClick={() => { setErrorAccion(null); setModalCrear(true); }}>
           Nuevo departamento
         </Button>
       </div>
 
-      {/* ── Barra de herramientas (busqueda + contador) ── */}
+      {/* -- Barra de herramientas (busqueda + contador) -- */}
       <div className="dept-toolbar">
         <div className="search-bar">
           <span className="search-bar__icon"><IcoSearch /></span>
@@ -210,7 +209,7 @@ export default function Departments() {
         )}
       </div>
 
-      {/* ── Estado de carga (skeleton) ── */}
+      {/* -- Estado de carga (skeleton) -- */}
       {cargando && (
         <div className="card">
           <div className="dept-skeleton">
@@ -224,12 +223,12 @@ export default function Departments() {
         </div>
       )}
 
-      {/* ── Error de carga ── */}
+      {/* -- Error de carga -- */}
       {!cargando && error && (
         <Alert tipo="error" onCerrar={clearDepartmentError}>{error}</Alert>
       )}
 
-      {/* ── Tabla de departamentos ── */}
+      {/* -- Tabla de departamentos -- */}
       {!cargando && !error && (
         <div className="card">
           {filtrados.length === 0 ? (
@@ -260,7 +259,7 @@ export default function Departments() {
                       {/* Nombre del departamento */}
                       <td>
                         <div className="dept-name-cell">
-                          <span className="dept-avatar">{dep.name?.charAt(0)?.toUpperCase() ?? '?'}</span>
+                          <span className="dept-avatar">{dep.name?.charAt(0)?.toUpperCase() ?? 'D'}</span>
                           <span className="table__primary">{dep.name}</span>
                         </div>
                       </td>
@@ -302,7 +301,7 @@ export default function Departments() {
         </div>
       )}
 
-      {/* ══ Modal: Crear departamento ══ */}
+      {/* -- Modal: Crear departamento -- */}
       {modalCrear && (
         <Modal titulo="Nuevo departamento" onClose={() => setModalCrear(false)}>
           <FormDepartamento
@@ -312,7 +311,7 @@ export default function Departments() {
         </Modal>
       )}
 
-      {/* ══ Modal: Editar departamento ══ */}
+      {/* -- Modal: Editar departamento -- */}
       {editando && (
         <Modal titulo="Editar departamento" onClose={() => setEditando(null)}>
           <FormDepartamento
@@ -323,7 +322,7 @@ export default function Departments() {
         </Modal>
       )}
 
-      {/* ══ Modal: Confirmar eliminacion ══ */}
+      {/* -- Modal: Confirmar eliminacion -- */}
       {eliminando && (
         <Modal
           titulo="Eliminar departamento"
@@ -337,7 +336,7 @@ export default function Departments() {
         >
           <div className="dept-confirm">
             {errorAccion && <Alert tipo="error" onCerrar={() => setErrorAccion(null)}>{errorAccion}</Alert>}
-            <p>?Esta seguro de eliminar el departamento <strong>{eliminando.name}</strong>?</p>
+            <p>Esta seguro de eliminar el departamento <strong>{eliminando.name}</strong>?</p>
             <p className="dept-confirm__warn">Esta accion no se puede deshacer.</p>
           </div>
         </Modal>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AppRouter.jsx — Enrutador principal de CorpHR.
  *
  * Define todas las rutas de la aplicacion con proteccion por rol:
@@ -26,8 +26,9 @@ import RecoverPassword from '../pages/RecoverPassword';
 
 /* Paginas del administrador */
 import Dashboard   from '../pages/Dashboard';
-import Employees   from '../pages/Employees';     /* Posiciones/Cargos → /api/products */
-import Departments from '../pages/Departments';   /* Departamentos     → /api/categories */
+import Employees         from '../pages/Employees';          /* Posiciones/Cargos → /api/cargos */
+import GestionEmpleados  from '../pages/GestionEmpleados';   /* Empleados         → /api/empleados */
+import Departments       from '../pages/Departments';        /* Departamentos     → /api/departamentos */
 import Attendance  from '../pages/Attendance';
 import Reports     from '../pages/Reports';
 import Register    from '../pages/Register';       /* Registro de usuarios → /api/auth/register */
@@ -121,6 +122,9 @@ export default function AppRouter() {
           } />
           <Route path="registro" element={
             <AdminRoute><Register /></AdminRoute>
+          } />
+          <Route path="empleados" element={
+            <AdminRoute><GestionEmpleados /></AdminRoute>
           } />
 
           {/* Rutas del empleado (cualquier usuario autenticado) */}

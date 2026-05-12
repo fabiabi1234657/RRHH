@@ -1,5 +1,5 @@
-﻿/**
- * Topbar.jsx — Barra superior fija de CorpHR.
+/**
+ * Topbar.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Barra superior fija de CorpHR.
  *
  * Muestra el titulo y subtitulo de la pagina actual
  * junto al toggle de tema (oscuro/claro) y la fecha del dia.
@@ -7,18 +7,17 @@
 import { useLocation } from 'react-router-dom';
 import { useAuth }     from '../../hooks/useAuth';
 import ThemeToggle     from '../ui/ThemeToggle';
-import './Topbar.css';
 
-/* ── Mapa ruta → { titulo, subtitulo } ── */
+/* -- Mapa ruta ? { titulo, subtitulo } -- */
 const TITULOS = {
   '/app/dashboard':     { titulo: 'Dashboard',      subtitulo: 'Resumen general del sistema' },
-  '/app/posiciones':    { titulo: 'Posiciones',      subtitulo: 'Gestión de cargos y roles organizacionales' },
+  '/app/posiciones':    { titulo: 'Posiciones',      subtitulo: 'GestiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de cargos y roles organizacionales' },
   '/app/departamentos': { titulo: 'Departamentos',   subtitulo: 'Estructura organizativa de la empresa' },
   '/app/asistencia':    { titulo: 'Asistencia',      subtitulo: 'Control y seguimiento de asistencia' },
   '/app/reportes':      { titulo: 'Reportes',        subtitulo: 'Informes y estadisticas del sistema' },
   '/app/generar-reportes': { titulo: 'Generar Reportes', subtitulo: 'Exportar datos en PDF y Excel' },
   '/app/registro':      { titulo: 'Registrar usuario', subtitulo: 'Alta de cuentas y permisos de acceso' },
-  '/app/mi-perfil':     { titulo: 'Mi Perfil',       subtitulo: 'Información personal y de cuenta' },
+  '/app/mi-perfil':     { titulo: 'Mi Perfil',       subtitulo: 'InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n personal y de cuenta' },
   '/app/mi-asistencia': { titulo: 'Mi Asistencia',   subtitulo: 'Historial personal de asistencia' },
 };
 
@@ -65,7 +64,7 @@ export default function Topbar({ onMenuClick = () => {} }) {
         <IcoMenu />
       </button>
 
-      {/* ── Lado izquierdo: titulo y subtitulo de la pagina ── */}
+      {/* -- Lado izquierdo: titulo y subtitulo de la pagina -- */}
       <div className="topbar__page">
         <h1 className="topbar__title">{titulo}</h1>
         {subtitulo && (
@@ -73,7 +72,7 @@ export default function Topbar({ onMenuClick = () => {} }) {
         )}
       </div>
 
-      {/* ── Lado derecho: saludo, fecha y toggle de tema ── */}
+      {/* -- Lado derecho: saludo, fecha y toggle de tema -- */}
       <div className="topbar__right">
 
         {/* Bloque de saludo al usuario */}
