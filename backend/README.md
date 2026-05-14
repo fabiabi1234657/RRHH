@@ -22,7 +22,7 @@ Se agrego documentacion interactiva de la API con Swagger para facilitar pruebas
 
 - Se instalaron las dependencias `swagger-ui-express` y `swagger-jsdoc`.
 - Se creo la configuracion en `src/config/swagger.js` con:
-  - `tags` por modulo (`Auth`, `Categories`, `Products`, `Attendance`, `Reports`).
+  - `tags` por modulo (`Auth`, `Empleados`, `Departamentos`, `Cargos`, `Asistencia`, `Reportes`).
   - `schemas` reutilizables para modelos y requests/responses.
   - seguridad por cookie JWT (`cookieAuth`, cookie `token`).
 - Se expuso la UI en `GET /api-docs` desde `server.js`.
@@ -51,20 +51,45 @@ http://localhost:5000/api-docs
 ```
 backend/
 ├── src/
-│   ├── config/           ← Configuraciones (conexión a BD)
-│   │   └── database.js
-│   ├── models/           ← Esquemas de datos (qué información guardamos)
-│   │   └── User.js
-│   ├── controllers/      ← Lógica de negocios (qué hacer con los datos)
-│   │   └── authController.js
-│   ├── routes/           ← URLs de la API (dónde hace peticiones el frontend)
-│   │   └── authRoutes.js
-│   └── middlewares/      ← Funciones que protegen rutas (verifican autenticación)
-│       └── authMiddleware.js
-├── server.js             ← Archivo principal que inicia el servidor
-├── package.json          ← Lista de dependencias
-├── .env.example          ← Ejemplo de variables de entorno
-└── .gitignore            ← Archivos que no se suben a git
+│   ├── config/
+│   │   ├── database.js         ← Conexión a MongoDB
+│   │   └── swagger.js          ← Configuración Swagger
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Department.js
+│   │   ├── Position.js
+│   │   ├── Employee.js
+│   │   └── Attendance.js
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── departmentController.js
+│   │   ├── positionController.js
+│   │   ├── employeeController.js
+│   │   ├── attendanceController.js
+│   │   └── reportController.js
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── departmentRoutes.js
+│   │   ├── positionRoutes.js
+│   │   ├── employeeRoutes.js
+│   │   ├── attendanceRoutes.js
+│   │   └── reportRoutes.js
+│   ├── middlewares/
+│   │   ├── authMiddleware.js
+│   │   └── roleMiddleware.js
+│   └── __tests__/
+│       ├── auth.test.js
+│       ├── attendance.test.js
+│       ├── reports.test.js
+│       └── rrhhModels.test.js
+├── scripts/
+│   ├── seedDatabase.js         ← Datos de ejemplo
+│   └── seedAdmin.js            ← Crea usuario administrador inicial
+├── server.js
+├── package.json
+├── Dockerfile
+├── .env.example
+└── .gitignore
 ```
 
 ##  Cómo ejecutar el backend
@@ -85,9 +110,13 @@ Ya está en tu carpeta
 2. Edita el archivo `.env` si es necesario:
    ```
    MONGO_URI=mongodb://localhost:27017/rrhh_db
-   JWT_SECRET=tu_clave_secreta_super_segura_cambiar_en_produccion
+   MONGO_URI_TEST=mongodb://localhost:27017/rrhh_test
+   JWT_SECRET=<cadena aleatoria de 64 bytes — ver .env.example>
    PORT=5000
+   NODE_ENV=development
    FRONTEND_URL=http://localhost:5173
+   ADMIN_EMAIL=admin@empresa.com
+   ADMIN_PASS=ClaveAdmin123
    ```
 
 ### Paso 4: Instalar dependencias
@@ -127,8 +156,9 @@ Este backend incluye pruebas de integración con Jest + Supertest sobre MongoDB 
 ```env
 MONGO_URI=mongodb://localhost:27017/rrhh_db
 MONGO_URI_TEST=mongodb://localhost:27017/rrhh_test
-JWT_SECRET=token_secreto_xd
+JWT_SECRET=<cadena aleatoria de 64 bytes — ver .env.example>
 PORT=5000
+NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -141,11 +171,9 @@ npm test
 
 ### Cobertura actual de pruebas
 
-- `auth.test.js`: registro, login, credenciales inválidas.
-- `categories.test.js`: acceso autenticado y autorización por rol (`employee`/`admin`).
-- `products.test.js`: CRUD protegido por rol y validaciones de categoría.
+- `auth.test.js`: registro, login, perfil, credenciales inválidas.
 - `attendance.test.js`: checkin/checkout, restricciones por rol, consultas admin por empleado y fecha.
-- `reports.test.js`: seguridad admin y coherencia de reportes con el nuevo dominio RRHH.
+- `reports.test.js`: seguridad admin y coherencia de reportes con el dominio RRHH.
 - `rrhhModels.test.js`: relaciones de modelos RRHH, `status` por defecto e índices únicos.
 
 ##  Endpoints de la API
@@ -227,21 +255,7 @@ Respuesta exitosa (200):
 }
 ```
 
-## Nuevos Modelos
-
-### Category
-
-- `name` (String, requerido): nombre de la categoria.
-- `description` (String, opcional): descripcion de la categoria.
-- `createdAt` (Date): fecha de creacion automatica.
-
-### Product
-
-- `name` (String, requerido): nombre del producto.
-- `description` (String, opcional): descripcion del producto.
-- `price` (Number, requerido): precio del producto (minimo `0`).
-- `categoryId` (ObjectId, requerido): referencia a `Category`.
-- `createdAt` (Date): fecha de creacion automatica.
+## Modelos de datos
 
 ### Department
 
@@ -281,37 +295,45 @@ Respuesta exitosa (200):
 - `Position (1) -> (N) Employee`: Un cargo puede tener muchos empleados asociados.
 - `Department (1) -> (N) Employee`: Un departamento puede tener muchos empleados.
 - `Employee (1) -> (N) Attendance`: Un empleado puede tener muchos registros de asistencia.
-- `Category (1) -> (N) Product`: Una categoría puede tener muchos productos.
-- `Product (N) -> (1) Category`: Un producto pertenece a una categoría.
 
 ## Middleware de roles
 
 - `protect`: valida sesión y agrega `req.user` con `id` y `role`.
 - `authorize(...roles)`: permite acceso solo si el rol de `req.user.role` está dentro de los roles permitidos.
-- Aplicado a escritura de categorías y productos:
-  - `POST /api/categories`, `PUT /api/categories/:id`, `DELETE /api/categories/:id`
-  - `POST /api/products`, `PUT /api/products/:id`, `DELETE /api/products/:id`
-- Los endpoints `GET` de categorías y productos siguen disponibles para cualquier usuario autenticado.
+- Aplicado a escritura de recursos RRHH:
+  - `POST /api/departamentos`, `PUT /api/departamentos/:id`, `DELETE /api/departamentos/:id`
+  - `POST /api/cargos`, `PUT /api/cargos/:id`, `DELETE /api/cargos/:id`
+  - `POST /api/empleados`, `PUT /api/empleados/:id`, `DELETE /api/empleados/:id`
+- Los endpoints `GET` son accesibles para cualquier usuario autenticado.
 
-## Nuevos Endpoints
+## Endpoints RRHH
 
-### Categories (`/api/categories`)
+### Departamentos (`/api/departamentos`)
 **Requiere autenticación (token en cookie)**
 
-- `GET /api/categories`: listar categorías.
-- `GET /api/categories/:id`: obtener categoría por ID.
-- `POST /api/categories`: crear categoría (solo **admin**).
-- `PUT /api/categories/:id`: actualizar categoría (solo **admin**).
-- `DELETE /api/categories/:id`: eliminar categoría (solo **admin**).
+- `GET /api/departamentos`: listar departamentos.
+- `GET /api/departamentos/:id`: obtener departamento por ID.
+- `POST /api/departamentos`: crear departamento (solo **admin**).
+- `PUT /api/departamentos/:id`: actualizar departamento (solo **admin**).
+- `DELETE /api/departamentos/:id`: eliminar departamento (solo **admin**).
 
-### Products (`/api/products`)
+### Cargos (`/api/cargos`)
 **Requiere autenticación (token en cookie)**
 
-- `GET /api/products`: listar productos (con categoría populada).
-- `GET /api/products/:id`: obtener producto por ID.
-- `POST /api/products`: crear producto (solo **admin**).
-- `PUT /api/products/:id`: actualizar producto (solo **admin**).
-- `DELETE /api/products/:id`: eliminar producto (solo **admin**).
+- `GET /api/cargos`: listar cargos.
+- `GET /api/cargos/:id`: obtener cargo por ID.
+- `POST /api/cargos`: crear cargo (solo **admin**).
+- `PUT /api/cargos/:id`: actualizar cargo (solo **admin**).
+- `DELETE /api/cargos/:id`: eliminar cargo (solo **admin**).
+
+### Empleados (`/api/empleados`)
+**Requiere autenticación (token en cookie)**
+
+- `GET /api/empleados`: listar empleados.
+- `GET /api/empleados/:id`: obtener empleado por ID.
+- `POST /api/empleados`: crear empleado (solo **admin**).
+- `PUT /api/empleados/:id`: actualizar empleado (solo **admin**).
+- `DELETE /api/empleados/:id`: eliminar empleado (solo **admin**).
 
 ### Reports (`/api/reports`)
 **Requiere autenticación + rol admin**
@@ -329,17 +351,18 @@ Respuesta exitosa (200):
 
 ## Ejemplos de peticiones y respuestas
 
-### 1) Crear categoria
+### 1) Crear departamento
 
 Request:
 
 ```http
-POST /api/categories
+POST /api/departamentos
 Content-Type: application/json
+Cookie: token=<jwt_token>
 
 {
-  "name": "Laptops",
-  "description": "Equipos portatiles"
+  "name": "Tecnologia",
+  "description": "Desarrollo de software"
 }
 ```
 
@@ -348,30 +371,28 @@ Response `201`:
 ```json
 {
   "success": true,
-  "message": "Categoria creada correctamente",
-  "category": {
+  "message": "Departamento creado correctamente",
+  "department": {
     "_id": "67d7503d0f9a0d0f40e8f111",
-    "name": "Laptops",
-    "description": "Equipos portatiles",
-    "createdAt": "2026-03-17T18:00:00.000Z",
-    "__v": 0
+    "name": "Tecnologia",
+    "description": "Desarrollo de software",
+    "createdAt": "2026-03-17T18:00:00.000Z"
   }
 }
 ```
 
-### 2) Crear producto
+### 2) Crear cargo
 
 Request:
 
 ```http
-POST /api/products
+POST /api/cargos
 Content-Type: application/json
+Cookie: token=<jwt_token>
 
 {
-  "name": "ThinkPad X1",
-  "description": "Laptop para trabajo",
-  "price": 1850,
-  "categoryId": "67d7503d0f9a0d0f40e8f111"
+  "title": "Desarrollador Backend",
+  "department": "67d7503d0f9a0d0f40e8f111"
 }
 ```
 
@@ -380,55 +401,20 @@ Response `201`:
 ```json
 {
   "success": true,
-  "message": "Producto creado correctamente",
-  "product": {
+  "message": "Cargo creado correctamente",
+  "position": {
     "_id": "67d7508d0f9a0d0f40e8f222",
-    "name": "ThinkPad X1",
-    "description": "Laptop para trabajo",
-    "price": 1850,
-    "categoryId": {
+    "title": "Desarrollador Backend",
+    "department": {
       "_id": "67d7503d0f9a0d0f40e8f111",
-      "name": "Laptops",
-      "description": "Equipos portatiles"
+      "name": "Tecnologia"
     },
-    "createdAt": "2026-03-17T18:02:00.000Z",
-    "__v": 0
+    "createdAt": "2026-03-17T18:02:00.000Z"
   }
 }
 ```
 
-### 3) Obtener productos
-
-Request:
-
-```http
-GET /api/products
-```
-
-Response `200`:
-
-```json
-{
-  "success": true,
-  "products": [
-    {
-      "_id": "67d7508d0f9a0d0f40e8f222",
-      "name": "ThinkPad X1",
-      "description": "Laptop para trabajo",
-      "price": 1850,
-      "categoryId": {
-        "_id": "67d7503d0f9a0d0f40e8f111",
-        "name": "Laptops",
-        "description": "Equipos portatiles"
-      },
-      "createdAt": "2026-03-17T18:02:00.000Z",
-      "__v": 0
-    }
-  ]
-}
-```
-
-### 4) Reporte de asistencia mensual
+### 3) Reporte de asistencia mensual
 
 Request:
 
@@ -565,19 +551,7 @@ Los tests cubren:
 - ✅ POST `/api/auth/register` — email duplicado devuelve 400
 - ✅ POST `/api/auth/login` — credenciales correctas devuelven 200 con cookie
 - ✅ POST `/api/auth/login` — credenciales incorrectas devuelven 401
-
-**categories.test.js:**
-- ✅ GET `/api/categories` — sin autenticación devuelve 401
-- ✅ GET `/api/categories` — autenticado devuelve 200 con array
-- ✅ POST `/api/categories` — como `employee` devuelve 403
-- ✅ POST `/api/categories` — como `admin` devuelve 201
-- ✅ DELETE `/api/categories/:id` — como `admin` devuelve 200
-
-**products.test.js:**
-- ✅ GET `/api/products` — autenticado devuelve 200 con productos y categoría populada
-- ✅ POST `/api/products` — como `admin` con `categoryId` válido devuelve 201
-- ✅ POST `/api/products` — con `categoryId` inexistente devuelve 400
-- ✅ PUT `/api/products/:id` — como `employee` devuelve 403
+- ✅ PUT `/api/auth/profile` — actualiza nombre o contraseña con sesión activa
 
 ### Nota sobre limpieza
 
@@ -603,12 +577,21 @@ Los tests limpian automáticamente la base de datos de prueba después de cada s
 - **CORS configurado**: Solo el frontend autorizado puede hacer peticiones
 - **Variables de entorno**: Datos sensibles no están en el código
 
-##  Próximos pasos
+##  Despliegue con Docker
 
-1. Agregar middleware de autorizacion por rol para proteger operaciones de escritura.
-2. Crear pruebas de integracion para `/api/categories` y `/api/products`.
-3. Conectar estas rutas con el frontend para reemplazar datos mock.
+El backend incluye un `Dockerfile` y forma parte del `docker-compose.yml` en la raíz del proyecto.
+
+```bash
+# Desde la raíz del proyecto
+cp backend/.env.example backend/.env
+docker-compose up -d
+```
+
+Crear administrador inicial en el contenedor:
+
+```bash
+docker-compose exec backend npm run seed:admin
+```
 
 ---
-
 

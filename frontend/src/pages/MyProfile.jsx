@@ -129,7 +129,7 @@ export default function MyProfile() {
       await cargarPerfil();
       setModalAbierto(false);
       setExito('Perfil actualizado correctamente.');
-      toast.success('Perfil actualizado', 'Los cambios han sido guardados correctamente.');
+      toast.success('Perfil actualizado', 'Tus cambios fueron guardados correctamente.');
     } catch (e) {
       setErrorModal(e.message || 'Error al actualizar el perfil');
     } finally {

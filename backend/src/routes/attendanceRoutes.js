@@ -2,6 +2,7 @@ import express from 'express';
 import {
   checkIn,
   checkOut,
+  getMyAttendance,
   getByEmployee,
   getByDate
 } from '../controllers/attendanceController.js';
@@ -98,6 +99,8 @@ router.post('/checkin', protect, authorize('employee', 'admin'), checkIn);
  *         $ref: '#/components/responses/ServerError'
  */
 router.put('/checkout', protect, authorize('employee', 'admin'), checkOut);
+
+router.get('/me', protect, authorize('employee', 'admin'), getMyAttendance);
 
 // Endpoints administrativos
 /**

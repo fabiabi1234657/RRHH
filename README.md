@@ -23,19 +23,20 @@ La aplicación es una **SPA (Single Page Application)** con:
 ##  Arquitectura del Proyecto
 
 > **Nota importante:** El backend oficial y unico del proyecto es la carpeta `backend/`.
-> Cualquier carpeta antigua o duplicada fue eliminada para evitar conflictos futuros.
 
 ```
 RRHH/
 ├── frontend/               ← Interfaz visual (React + Vite)
 ├── backend/                ← API REST (Node.js + Express)
 │   ├── src/
-│   │   ├── models/        ← Modelos de datos
+│   │   ├── models/        ← Modelos de datos (RRHH)
 │   │   ├── controllers/   ← Lógica de negocios
 │   │   ├── routes/        ← Endpoints de la API
-│   │   ├── middlewares/   ← Validaciones de seguridad
-│   │   └── config/        ← Configuraciones
+│   │   ├── middlewares/   ← Autenticación y autorización
+│   │   └── config/        ← MongoDB y Swagger
+│   ├── scripts/           ← seedDatabase.js, seedAdmin.js
 │   └── server.js          ← Archivo principal del servidor
+├── docker-compose.yml      ← Stack completo en contenedores
 └── README.md
 ```
 
@@ -44,10 +45,11 @@ RRHH/
 ##  Tecnologías Utilizadas
 
 ### Frontend
-- React
-- Vite
-- Context API + Hooks personalizados
-- React Router
+- React 19 + Vite 8
+- React Router v7
+- Zustand (estado global)
+- Axios (cliente HTTP)
+- jsPDF (exportación de reportes en PDF/CSV)
 
 ### Backend
 - **Node.js**: Entorno JavaScript en servidor
@@ -67,28 +69,51 @@ RRHH/
 
 ##  Cómo Ejecutar el Proyecto
 
-### Backend
+### Con Docker (recomendado)
+
+```bash
+cp backend/.env.example backend/.env   # completar con valores reales
+docker-compose up -d
+```
+
+Stack disponible en `http://localhost` (frontend) y `http://localhost:5000` (API).
+
+Crear el usuario administrador inicial:
+
+```bash
+docker-compose exec backend npm run seed:admin
+```
+
+### Localmente (desarrollo)
+
+#### Backend
+
 ```bash
 cd backend
+cp .env.example .env    # completar con valores reales
 npm install
+npm run seed:admin      # crea el usuario admin inicial
 npm run dev
 ```
+
 El backend se ejecutará en: `http://localhost:5000`
 
-Pruebas backend:
+Pruebas:
+
 ```bash
-cd backend
 npm test
 ```
 
 Lee [backend/README.md](backend/README.md) para más detalles.
 
-### Frontend
+#### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
 El frontend se ejecutará en: `http://localhost:5173`
 
 ---

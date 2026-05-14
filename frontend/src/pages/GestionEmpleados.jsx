@@ -201,11 +201,11 @@ export default function GestionEmpleados() {
     try {
       await crearEmpleadoAPI({ userId, position, department, hireDate, status });
       setModalCrear(false);
-      toast.success('Empleado creado', 'El empleado fue registrado correctamente.');
+      toast.success('Empleado registrado', 'El perfil del empleado fue creado exitosamente.');
       await cargar();
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al crear');
-      toast.error('Error al crear', e.message ?? 'No se pudo crear el empleado.');
+      toast.error('No se pudo registrar', e.message ?? 'Verifica los datos del formulario.');
     } finally { setGuardando(false); }
   };
 
@@ -214,11 +214,11 @@ export default function GestionEmpleados() {
     try {
       await actualizarEmpleadoAPI(editando._id, { position, department, hireDate, status });
       setEditando(null);
-      toast.success('Empleado actualizado', 'Los datos fueron actualizados.');
+      toast.success('Empleado actualizado', 'Los datos del perfil fueron guardados.');
       await cargar();
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al actualizar');
-      toast.error('Error al actualizar', e.message ?? 'No se pudo actualizar.');
+      toast.error('No se pudo actualizar', e.message ?? 'Inténtalo de nuevo.');
     } finally { setGuardando(false); }
   };
 
@@ -227,11 +227,11 @@ export default function GestionEmpleados() {
     try {
       await eliminarEmpleadoAPI(eliminando._id);
       setEliminando(null);
-      toast.success('Empleado eliminado', 'El perfil fue eliminado del sistema.');
+      toast.success('Empleado eliminado', 'El perfil fue removido del sistema.');
       await cargar();
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al eliminar');
-      toast.error('Error al eliminar', e.message ?? 'No se pudo eliminar.');
+      toast.error('No se pudo eliminar', e.message ?? 'Inténtalo de nuevo.');
     } finally { setGuardando(false); }
   };
 

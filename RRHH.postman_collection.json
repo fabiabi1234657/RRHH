@@ -1,17 +1,22 @@
 {
   "info": {
     "name": "RRHH API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleccion completa de la API REST del Sistema de Gestion de Recursos Humanos.\n\nBaseUrl: http://localhost:5000\n\nAutenticacion: cookie HTTP-only 'token' (se gestiona automaticamente). Activar 'Send cookies' en Postman Settings."
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5000" }
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "departmentId", "value": "" },
+    { "key": "positionId", "value": "" },
+    { "key": "employeeId", "value": "" }
   ],
   "item": [
     {
       "name": "Auth",
+      "description": "Registro, login, perfil y sesion. El token JWT viaja en cookie HTTP-only.",
       "item": [
         {
-          "name": "Register employee",
+          "name": "Register employee (publico)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -19,6 +24,18 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Empleado Demo\",\n  \"email\": \"empleado.demo@empresa.com\",\n  \"password\": \"Password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register admin (requiere admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register-admin",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin Demo\",\n  \"email\": \"admin.demo@empresa.com\",\n  \"password\": \"Password123\",\n  \"role\": \"admin\"\n}"
             }
           }
         },
@@ -35,7 +52,7 @@
           }
         },
         {
-          "name": "Profile",
+          "name": "Get profile",
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/auth/profile"
@@ -49,7 +66,7 @@
             "url": "{{baseUrl}}/api/auth/profile",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Empleado Demo Actualizado\"\n}"
+              "raw": "{\n  \"name\": \"Empleado Demo Actualizado\",\n  \"password\": \"NuevaClave123\"\n}"
             }
           }
         },
@@ -75,30 +92,248 @@
       ]
     },
     {
-      "name": "Categories",
+      "name": "Departamentos",
+      "description": "CRUD de departamentos. Lectura: cualquier usuario autenticado. Escritura: solo admin.",
       "item": [
-        { "name": "List", "request": { "method": "GET", "url": "{{baseUrl}}/api/categories" } },
         {
-          "name": "Create",
+          "name": "List departamentos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/departamentos"
+          }
+        },
+        {
+          "name": "Get departamento by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/departamentos/{{departmentId}}"
+          }
+        },
+        {
+          "name": "Create departamento (admin)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{baseUrl}}/api/categories",
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Talento Humano\",\n  \"description\": \"Area de RRHH\"\n}" }
+            "url": "{{baseUrl}}/api/departamentos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tecnologia\",\n  \"description\": \"Desarrollo de software e infraestructura\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update departamento (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/departamentos/{{departmentId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tecnologia e Innovacion\",\n  \"description\": \"Descripcion actualizada\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete departamento (admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/departamentos/{{departmentId}}"
           }
         }
       ]
     },
     {
-      "name": "Products",
+      "name": "Cargos",
+      "description": "CRUD de cargos/posiciones. Requiere departmentId valido. Escritura: solo admin.",
       "item": [
-        { "name": "List", "request": { "method": "GET", "url": "{{baseUrl}}/api/products" } }
+        {
+          "name": "List cargos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cargos"
+          }
+        },
+        {
+          "name": "Get cargo by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cargos/{{positionId}}"
+          }
+        },
+        {
+          "name": "Create cargo (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/cargos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Desarrollador Backend\",\n  \"department\": \"{{departmentId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update cargo (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/cargos/{{positionId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Desarrollador Senior\",\n  \"department\": \"{{departmentId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete cargo (admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/cargos/{{positionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empleados",
+      "description": "CRUD de empleados. Vincula un User con un Position y Department. Escritura: solo admin.",
+      "item": [
+        {
+          "name": "List empleados",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/empleados"
+          }
+        },
+        {
+          "name": "Get empleado by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/empleados/{{employeeId}}"
+          }
+        },
+        {
+          "name": "Create empleado (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/empleados",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"<ObjectId del User>\",\n  \"position\": \"{{positionId}}\",\n  \"department\": \"{{departmentId}}\",\n  \"hireDate\": \"2024-01-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update empleado (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/empleados/{{employeeId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"position\": \"{{positionId}}\",\n  \"department\": \"{{departmentId}}\",\n  \"status\": \"active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete empleado (admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/empleados/{{employeeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Asistencia",
+      "description": "Checkin/checkout del empleado autenticado. Consultas por empleado o fecha: solo admin.",
+      "item": [
+        {
+          "name": "Check-in",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/attendance/checkin"
+          }
+        },
+        {
+          "name": "Check-out",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/attendance/checkout"
+          }
+        },
+        {
+          "name": "Mi asistencia",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/attendance/me"
+          }
+        },
+        {
+          "name": "Asistencia por empleado (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/attendance/{{employeeId}}"
+          }
+        },
+        {
+          "name": "Asistencia por fecha (admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/date/2026-05-13",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "date", "2026-05-13"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "description": "Reportes de gestion. Todos requieren rol admin.",
+      "item": [
+        {
+          "name": "Asistencia mensual",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/attendance/monthly?month=5&year=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "attendance", "monthly"],
+              "query": [
+                { "key": "month", "value": "5" },
+                { "key": "year", "value": "2026" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Headcount por departamento",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/reports/headcount"
+          }
+        },
+        {
+          "name": "Resumen de empleado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/reports/employee/{{employeeId}}/summary"
+          }
+        }
       ]
     },
     {
       "name": "Docs",
       "item": [
-        { "name": "Swagger UI", "request": { "method": "GET", "url": "{{baseUrl}}/api-docs" } }
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api-docs"
+          }
+        }
       ]
     }
   ]

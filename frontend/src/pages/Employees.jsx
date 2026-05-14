@@ -142,10 +142,10 @@ export default function Employees() {
     try {
       await createPosition({ title: titulo, department: departamentoId });
       setModalCrear(false);
-      toast.success('Posicion creada', `"${titulo}" fue creada correctamente.`);
+      toast.success('Posición creada', `"${titulo}" fue añadida al catálogo de cargos.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al crear');
-      toast.error('Error al crear', e.message ?? 'No se pudo crear la posicion.');
+      toast.error('No se pudo crear', e.message ?? 'Verifica los datos e intenta de nuevo.');
     } finally { setGuardando(false); }
   };
 
@@ -154,10 +154,10 @@ export default function Employees() {
     try {
       await updatePosition(editando._id, { title: titulo, department: departamentoId });
       setEditando(null);
-      toast.success('Posicion actualizada', `"${titulo}" fue actualizada correctamente.`);
+      toast.success('Posición actualizada', `"${titulo}" fue guardada con los nuevos datos.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al actualizar');
-      toast.error('Error al actualizar', e.message ?? 'No se pudo actualizar la posicion.');
+      toast.error('No se pudo actualizar', e.message ?? 'Verifica los datos e intenta de nuevo.');
     } finally { setGuardando(false); }
   };
 
@@ -167,10 +167,10 @@ export default function Employees() {
       const titulo = eliminando.title;
       await deletePosition(eliminando._id);
       setEliminando(null);
-      toast.success('Posicion eliminada', `"${titulo}" fue eliminada.`);
+      toast.success('Posición eliminada', `"${titulo}" fue removida del catálogo.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al eliminar');
-      toast.error('Error al eliminar', e.message ?? 'No se pudo eliminar la posicion.');
+      toast.error('No se pudo eliminar', e.message ?? 'Verifica que no esté asignada a empleados.');
     } finally { setGuardando(false); }
   };
 

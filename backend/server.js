@@ -2,14 +2,13 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import swaggerUi from 'swagger-ui-express';
 import connectDB from './src/config/database.js';
 import swaggerSpec from './src/config/swagger.js';
 import authRoutes from './src/routes/authRoutes.js';
-import categoryRoutes from './src/routes/categoryRoutes.js';
-import productRoutes from './src/routes/productRoutes.js';
 import reportRoutes from './src/routes/reportRoutes.js';
 import attendanceRoutes from './src/routes/attendanceRoutes.js';
 import employeeRoutes from './src/routes/employeeRoutes.js';
@@ -31,7 +30,14 @@ app.use(express.json());
 // 2. Parsear cookies
 app.use(cookieParser());
 
-// 3. Configurar CORS (para que el frontend pueda hacer peticiones)
+// 3. Logging HTTP (solo en desarrollo)
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
+
+// 4. Configurar CORS (para que el frontend pueda hacer peticiones)
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true // Permitir envío de cookies
@@ -43,8 +49,6 @@ connectDB();
 // RUTAS DE LA API
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/products', productRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/empleados', employeeRoutes);

@@ -40,19 +40,7 @@ export const register = async (req, res) => {
       role: 'employee'
     });
 
-    // Generar token
-    const token = generateToken(user._id);
-
-    // Enviar token en una cookie HTTP-only
-    // HTTP-only significa que NO se puede acceder desde JavaScript, solo HTTP
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días en milisegundos
-    });
-
-    // Responder al cliente
+    // Responder al cliente (sin cookie — el usuario debe hacer login explícito)
     res.status(201).json({
       success: true,
       message: 'Usuario registrado correctamente',

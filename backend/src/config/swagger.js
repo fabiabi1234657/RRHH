@@ -21,9 +21,7 @@ const swaggerOptions = {
       { name: 'Departamentos', description: 'Gestion de departamentos' },
       { name: 'Cargos', description: 'Gestion de cargos y posiciones' },
       { name: 'Asistencia', description: 'Control de asistencia y registros diarios' },
-      { name: 'Reportes', description: 'Reportes administrativos' },
-      { name: 'Categorias', description: 'Gestion de categorias de productos' },
-      { name: 'Productos', description: 'Gestion de productos' }
+      { name: 'Reportes', description: 'Reportes administrativos' }
     ],
     components: {
       securitySchemes: {
@@ -137,38 +135,6 @@ const swaggerOptions = {
             createdAt: { type: 'string', format: 'date-time' }
           }
         },
-        Category: {
-          type: 'object',
-          properties: {
-            _id: { type: 'string', example: '65f0a1b2c3d4e5f678901239' },
-            name: { type: 'string', example: 'Administracion' },
-            description: { type: 'string', example: 'Area administrativa' },
-            createdAt: { type: 'string', format: 'date-time' }
-          }
-        },
-        Product: {
-          type: 'object',
-          properties: {
-            _id: { type: 'string', example: '65f0a1b2c3d4e5f678901240' },
-            name: { type: 'string', example: 'Laptop corporativa' },
-            description: { type: 'string', example: 'Equipo de trabajo para empleado' },
-            price: { type: 'number', example: 3500 },
-            categoryId: {
-              oneOf: [
-                { type: 'string', example: '65f0a1b2c3d4e5f678901239' },
-                {
-                  type: 'object',
-                  properties: {
-                    _id: { type: 'string', example: '65f0a1b2c3d4e5f678901239' },
-                    name: { type: 'string', example: 'Administracion' },
-                    description: { type: 'string', example: 'Area administrativa' }
-                  }
-                }
-              ]
-            },
-            createdAt: { type: 'string', format: 'date-time' }
-          }
-        },
         RegisterRequest: {
           type: 'object',
           required: ['name', 'email', 'password'],
@@ -184,24 +150,6 @@ const swaggerOptions = {
           properties: {
             email: { type: 'string', format: 'email', example: 'juan@empresa.com' },
             password: { type: 'string', format: 'password', example: 'Secreto123' }
-          }
-        },
-        CategoryRequest: {
-          type: 'object',
-          required: ['name'],
-          properties: {
-            name: { type: 'string', example: 'Talento Humano' },
-            description: { type: 'string', example: 'Procesos de RRHH' }
-          }
-        },
-        ProductRequest: {
-          type: 'object',
-          required: ['name', 'price', 'categoryId'],
-          properties: {
-            name: { type: 'string', example: 'Tarjeta de acceso' },
-            description: { type: 'string', example: 'Credencial para ingreso' },
-            price: { type: 'number', minimum: 0, example: 25 },
-            categoryId: { type: 'string', example: '65f0a1b2c3d4e5f678901239' }
           }
         },
         CheckInRequest: {

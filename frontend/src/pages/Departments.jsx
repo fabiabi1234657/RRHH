@@ -134,10 +134,10 @@ export default function Departments() {
     try {
       await createDepartment({ name: nombre, description: descripcion });
       setModalCrear(false);
-      toast.success('Departamento creado', `"${nombre}" fue creado correctamente.`);
+      toast.success('Departamento creado', `"${nombre}" fue añadido al sistema correctamente.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al crear');
-      toast.error('Error al crear', e.message ?? 'No se pudo crear el departamento.');
+      toast.error('No se pudo crear', e.message ?? 'Verifica los datos e intenta de nuevo.');
     } finally {
       setGuardando(false);
     }
@@ -150,10 +150,10 @@ export default function Departments() {
     try {
       await updateDepartment(editando._id, { name: nombre, description: descripcion });
       setEditando(null);
-      toast.success('Departamento actualizado', `"${nombre}" fue actualizado correctamente.`);
+      toast.success('Departamento actualizado', `"${nombre}" fue guardado con los nuevos datos.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al actualizar');
-      toast.error('Error al actualizar', e.message ?? 'No se pudo actualizar el departamento.');
+      toast.error('No se pudo actualizar', e.message ?? 'Verifica los datos e intenta de nuevo.');
     } finally {
       setGuardando(false);
     }
@@ -167,10 +167,10 @@ export default function Departments() {
       const nombre = eliminando.name;
       await deleteDepartment(eliminando._id);
       setEliminando(null);
-      toast.success('Departamento eliminado', `"${nombre}" fue eliminado.`);
+      toast.success('Departamento eliminado', `"${nombre}" fue removido del sistema.`);
     } catch (e) {
       setErrorAccion(e.message ?? 'Error al eliminar');
-      toast.error('Error al eliminar', e.message ?? 'No se pudo eliminar el departamento.');
+      toast.error('No se pudo eliminar', e.message ?? 'Verifica que no tenga empleados asociados.');
     } finally {
       setGuardando(false);
     }

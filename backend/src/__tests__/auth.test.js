@@ -4,13 +4,8 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import connectDB from '../config/database.js';
 import authRoutes from '../routes/authRoutes.js';
-import categoryRoutes from '../routes/categoryRoutes.js';
-import productRoutes from '../routes/productRoutes.js';
 import User from '../models/User.js';
-import Category from '../models/Category.js';
-import Product from '../models/Product.js';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -26,8 +21,6 @@ app.use(cors({
 
 // Rutas
 app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/products', productRoutes);
 
 // Conectar a BD de prueba antes de las pruebas
 beforeAll(async () => {
@@ -47,8 +40,6 @@ beforeAll(async () => {
 afterAll(async () => {
   try {
     await User.deleteMany({});
-    await Category.deleteMany({});
-    await Product.deleteMany({});
     await mongoose.disconnect();
   } catch (error) {
     console.error('Error limpiando BD:', error);
@@ -150,6 +141,14 @@ describe('Autenticacion - perfil, recuperacion y registro admin', () => {
         password: 'Password123'
       })
       .expect(201);
+
+    await agent
+      .post('/api/auth/login')
+      .send({
+        email: 'juan@example.com',
+        password: 'Password123'
+      })
+      .expect(200);
 
     const response = await agent
       .put('/api/auth/profile')

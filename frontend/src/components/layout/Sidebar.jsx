@@ -53,7 +53,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
   /* Manejar el cierre de sesion con redireccion al login */
   const manejarLogout = async () => {
     await logout();
-    toast.info('Sesion cerrada', 'Hasta pronto.');
+    toast.info('Sesión cerrada', 'Tu sesión ha finalizado. ¡Hasta pronto!');
     onClose();
     navigate('/login', { replace: true });
   };

@@ -203,6 +203,43 @@ export const getByEmployee = async (req, res) => {
   }
 };
 
+export const getMyAttendance = async (req, res) => {
+  try {
+    const employee = await getEmployeeFromSession(req.user.id);
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: 'No existe perfil de empleado para este usuario'
+      });
+    }
+
+    const attendance = await Attendance.find({ employeeId: employee._id })
+      .sort({ date: -1 })
+      .populate({
+        path: 'employeeId',
+        populate: [
+          { path: 'userId', select: 'name email role' },
+          { path: 'position', select: 'title' },
+          { path: 'department', select: 'name' }
+        ]
+      });
+
+    return res.json({
+      success: true,
+      employee,
+      total: attendance.length,
+      attendance
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error obteniendo tu asistencia',
+      error: error.message
+    });
+  }
+};
+
 export const getByDate = async (req, res) => {
   try {
     const { date } = req.params;

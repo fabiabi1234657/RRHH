@@ -7,7 +7,6 @@ const IcoClock = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="non
 const IcoChart = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
 const IcoShield = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
 const IcoBriefcase = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>;
-const IcoArrow = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
 const IcoCheck = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 
 const ADMIN_FEATURES = [
@@ -174,16 +173,7 @@ export default function Home() {
             Gestiona empleados, cargos y departamentos con control de asistencia en tiempo real, reportes mensuales y acceso diferenciado por roles. Toda la operación de RRHH sin complejidad.
           </p>
 
-          <div className="home-hero__ctas">
-            <Link to="/login?rol=admin" className="home-cta home-cta--primary">
-              <span>Acceso administrador</span>
-              <IcoArrow />
-            </Link>
-            <Link to="/login?rol=empleado" className="home-cta home-cta--secondary">
-              <span>Acceso empleado</span>
-              <IcoArrow />
-            </Link>
-          </div>
+
         </div>
       </section>
 
