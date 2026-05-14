@@ -2,7 +2,8 @@ import express from 'express';
 import {
   getMonthlyAttendanceReport,
   getHeadcountReport,
-  getEmployeeSummary
+  getEmployeeSummary,
+  getAttendanceTrend
 } from '../controllers/reportController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import { authorize } from '../middlewares/roleMiddleware.js';
@@ -217,5 +218,8 @@ router.get('/headcount', getHeadcountReport);
  *         $ref: '#/components/responses/ServerError'
  */
 router.get('/employee/:employeeId/summary', getEmployeeSummary);
+
+// Tendencia de asistencia mensual (últimos N meses)
+router.get('/attendance/trend', getAttendanceTrend);
 
 export default router;

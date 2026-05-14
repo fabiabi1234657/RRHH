@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   obtenerEmpleadosAPI,
   crearEmpleadoAPI,
@@ -12,6 +12,7 @@ import Button from '../components/ui/Button';
 import Badge  from '../components/ui/Badge';
 import Alert  from '../components/ui/Alert';
 import { toast } from '../stores/useToastStore';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 /* -- Iconos -- */
 const IcoEdit = () => (
@@ -239,6 +240,13 @@ export default function GestionEmpleados() {
     ? new Date(iso).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' })
     : '-';
 
+  const estadoData = useMemo(() => [
+    { name: 'Activos',   value: empleados.filter(e => e.status === 'active').length },
+    { name: 'Inactivos', value: empleados.filter(e => e.status === 'inactive').length },
+  ].filter(d => d.value > 0), [empleados]);
+
+  const TT_STYLE = { background: '#1A2238', border: '1px solid #2A3450', borderRadius: 8, color: '#F1F5F9', fontSize: 12 };
+
   const resolverNombre = emp => {
     const u = emp.userId;
     if (!u) return '-';
@@ -269,6 +277,36 @@ export default function GestionEmpleados() {
           Nuevo empleado
         </Button>
       </div>
+
+      {/* Mini donut: estado del personal */}
+      {!cargando && estadoData.length > 0 && (
+        <div className="chart-row--single">
+          <div className="card chart-card">
+            <div className="card__header">
+              <div className="card__header-left">
+                <h3 className="card__title">Estado del personal</h3>
+                <span className="card__count">{empleados.length} registros totales</span>
+              </div>
+            </div>
+            <div className="chart-card__body--sm" style={{ height: 200, padding: '12px 4px 8px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={estadoData} cx="50%" cy="50%"
+                    innerRadius="48%" outerRadius="72%"
+                    dataKey="value" nameKey="name" paddingAngle={4}
+                  >
+                    <Cell fill="#10B981" stroke="none" />
+                    <Cell fill="#F59E0B" stroke="none" />
+                  </Pie>
+                  <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: '#CBD5E1' }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: '#94A3B8' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Barra de busqueda + contador */}
       <div className="dept-toolbar">

@@ -12,6 +12,10 @@ const positionSchema = new mongoose.Schema(
       ref: 'Department',
       required: [true, 'Por favor asigna un departamento']
     },
+    salary: {
+      type: Number,
+      default: 0
+    },
     createdAt: {
       type: Date,
       default: Date.now

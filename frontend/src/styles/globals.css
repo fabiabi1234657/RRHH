@@ -4004,6 +4004,65 @@ a:focus-visible {
 }
 
 /* ============================================================
+   Chart Containers — compartido entre páginas de analítica
+   Recharts + diseño CorpHR
+   ============================================================ */
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chart-section__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+/* Grid de 2 columnas para pares de gráficas */
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Versión de columna única centrada (resúmenes pequeños) */
+.chart-row--single {
+  grid-template-columns: minmax(0, 520px);
+}
+
+/* Área interior de la gráfica dentro de .card */
+.chart-card__body {
+  height: 280px;
+  padding: 14px 4px 10px;
+}
+
+.chart-card__body--sm {
+  height: 220px;
+}
+
+.chart-card__body--tall {
+  height: 320px;
+}
+
+/* Sección de gráficas en Reports */
+.reports-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .chart-row             { grid-template-columns: 1fr; }
+  .chart-row--single     { grid-template-columns: 1fr; }
+  .chart-card__body      { height: 240px; }
+  .chart-card__body--sm  { height: 200px; }
+}
+
+/* ============================================================
    Registro de usuario
    ============================================================ */
 .registro {

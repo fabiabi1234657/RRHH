@@ -12,13 +12,18 @@
  *  - Tabla con las 5 posiciones mas recientes
  *  - Lista de departamentos con conteo + barra de proporcion
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCatalogStore } from '../stores/useCatalogStore';
 import { obtenerEmpleadosAPI } from '../services/api';
 import StatCard from '../components/ui/StatCard';
 import Badge    from '../components/ui/Badge';
+import {
+  PieChart, Pie, Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Legend,
+} from 'recharts';
 
 /* -- Formatear fecha larga -- */
 const fmtFecha = () => new Intl.DateTimeFormat('es-CO', {
@@ -42,6 +47,7 @@ export default function Dashboard() {
   } = useCatalogStore();
 
   const [totalEmpleados, setTotalEmpleados] = useState(0);
+  const [empleados, setEmpleados] = useState([]);
   const [errorLocal, setErrorLocal] = useState('');
 
   /* -- Cargar datos al montar el componente -- */
@@ -52,7 +58,9 @@ export default function Dashboard() {
           fetchCatalogs(),
           obtenerEmpleadosAPI()
         ]);
-        setTotalEmpleados((rEmp.employees ?? rEmp ?? []).length);
+        const lista = rEmp.employees ?? rEmp ?? [];
+        setEmpleados(lista);
+        setTotalEmpleados(lista.length);
       } catch (err) {
         setErrorLocal(err.message || 'Error al cargar los datos');
       }
@@ -71,6 +79,45 @@ export default function Dashboard() {
   }));
 
   const maxCargos = Math.max(...deptosConConteo.map(d => d.totalCargos), 1);
+
+  /* -- Datos para grаficas -- */
+  const DEPT_COLORS = ['#6366F1','#A855F7','#06B6D4','#10B981','#F59E0B','#EF4444','#EC4899','#38BDF8','#8B5CF6','#F97316'];
+  const TT_STYLE = { background: '#1A2238', border: '1px solid #2A3450', borderRadius: 8, color: '#F1F5F9', fontSize: 12 };
+
+  const empsPorDept = useMemo(() => {
+    const map = {};
+    for (const emp of empleados) {
+      if (emp.status !== 'active') continue;
+      const name = typeof emp.department === 'object'
+        ? (emp.department?.name ?? 'Sin área')
+        : (departamentos.find(d => d._id === emp.department)?.name ?? 'Sin área');
+      map[name] = (map[name] ?? 0) + 1;
+    }
+    return Object.entries(map)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8);
+  }, [empleados, departamentos]);
+
+  const salarioPorDept = useMemo(() => {
+    const map = {};
+    for (const pos of posiciones) {
+      const name = typeof pos.department === 'object'
+        ? (pos.department?.name ?? 'Sin área')
+        : 'Sin área';
+      if (!map[name]) map[name] = { total: 0, count: 0 };
+      map[name].total += pos.salary ?? 0;
+      map[name].count += 1;
+    }
+    return Object.entries(map)
+      .map(([name, { total, count }]) => ({
+        name: name.length > 13 ? name.slice(0, 12) + '…' : name,
+        avg: count ? Math.round(total / count) : 0,
+      }))
+      .filter(d => d.avg > 0)
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 8);
+  }, [posiciones]);
 
   /* Obtener primer nombre del usuario */
   const primerNombre = user?.name?.split(' ')[0] || 'Administrador';
@@ -231,6 +278,79 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* -- Graficas de organización -- */}
+      {empleados.length > 0 && (
+        <div className="chart-section">
+          <h3 className="chart-section__title">Analítica de organización</h3>
+          <div className="chart-row">
+
+            {/* Donut: Empleados activos por departamento */}
+            <div className="card chart-card">
+              <div className="card__header">
+                <div className="card__header-left">
+                  <h3 className="card__title">Empleados por área</h3>
+                  <span className="card__count">personal activo</span>
+                </div>
+              </div>
+              <div className="chart-card__body">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={empsPorDept} cx="50%" cy="50%"
+                      innerRadius="52%" outerRadius="74%"
+                      dataKey="value" nameKey="name" paddingAngle={3}
+                    >
+                      {empsPorDept.map((_, i) => (
+                        <Cell key={i} fill={DEPT_COLORS[i % DEPT_COLORS.length]} stroke="none" />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: '#CBD5E1' }} />
+                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: '#94A3B8' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Bar horizontal: Salario promedio por departamento */}
+            <div className="card chart-card">
+              <div className="card__header">
+                <div className="card__header-left">
+                  <h3 className="card__title">Salario promedio por área</h3>
+                  <span className="card__count">basado en cargos registrados</span>
+                </div>
+              </div>
+              <div className="chart-card__body">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={salarioPorDept} layout="vertical"
+                    margin={{ left: 4, right: 28, top: 8, bottom: 8 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2A3450" horizontal={false} />
+                    <XAxis
+                      type="number"
+                      tick={{ fill: '#94A3B8', fontSize: 11 }}
+                      tickLine={false} axisLine={false}
+                      tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
+                    />
+                    <YAxis
+                      type="category" dataKey="name" width={88}
+                      tick={{ fill: '#CBD5E1', fontSize: 11 }}
+                      tickLine={false} axisLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={TT_STYLE} itemStyle={{ color: '#CBD5E1' }}
+                      formatter={v => [`$${v.toLocaleString('es-CO')}`, 'Promedio']}
+                    />
+                    <Bar dataKey="avg" fill="#6366F1" radius={[0, 4, 4, 0]} maxBarSize={22} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
