@@ -191,3 +191,47 @@ export const getEmployeeSummary = async (req, res) => {
     });
   }
 };
+
+// GET /api/reports/attendance/trend?months=5
+// Retorna resumen de asistencia de los últimos N meses para gráficas de tendencia
+export const getAttendanceTrend = async (req, res) => {
+  try {
+    const months = Math.min(Math.max(parseInt(req.query.months) || 5, 1), 12);
+    const now = new Date();
+    const MESES_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const result = [];
+
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const start = new Date(d.getFullYear(), d.getMonth(), 1);
+      const end   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const records = await Attendance.find({ date: { $gte: start, $lte: end } });
+      const present   = records.filter(r => r.status === 'present').length;
+      const late      = records.filter(r => r.status === 'late').length;
+      const absent    = records.filter(r => r.status === 'absent').length;
+      const justified = records.filter(r => r.status === 'justified').length;
+      const total     = records.length;
+
+      result.push({
+        month:     d.getMonth() + 1,
+        year:      d.getFullYear(),
+        label:     MESES_ES[d.getMonth()],
+        present,
+        late,
+        absent,
+        justified,
+        total,
+        rate: total ? Math.round(((present + justified) / total) * 100) : 0,
+      });
+    }
+
+    return res.json({ success: true, trend: result });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error generando tendencia de asistencia',
+      error: error.message,
+    });
+  }
+};

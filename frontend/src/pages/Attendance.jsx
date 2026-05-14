@@ -3,6 +3,7 @@ import { obtenerAsistenciaPorFechaAPI, obtenerEmpleadosAPI } from '../services/a
 import Alert from '../components/ui/Alert';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const IcoRefresh = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>;
 
@@ -75,6 +76,14 @@ export default function Attendance() {
     return base;
   }, [filas]);
 
+  const TT_STYLE = { background: '#1A2238', border: '1px solid #2A3450', borderRadius: 8, color: '#F1F5F9', fontSize: 12 };
+  const pieData = useMemo(() => [
+    { name: 'Presentes',    value: resumen.present,  color: '#10B981' },
+    { name: 'Tardanzas',    value: resumen.late,     color: '#F59E0B' },
+    { name: 'Ausentes',     value: resumen.absent,   color: '#EF4444' },
+    { name: 'Sin registro', value: resumen.missing,  color: '#6366F1' },
+  ].filter(d => d.value > 0), [resumen]);
+
   return (
     <div className="attendance-page">
       <div className="page-header page-header--panel">
@@ -96,6 +105,37 @@ export default function Attendance() {
         <MetricCard label="Ausentes" value={resumen.absent} tone="red" />
         <MetricCard label="Sin registro" value={resumen.missing} tone="blue" />
       </section>
+
+      {/* Distribución visual del día */}
+      {!cargando && pieData.length > 0 && (
+        <div className="chart-row--single">
+          <div className="card chart-card">
+            <div className="card__header">
+              <div className="card__header-left">
+                <h3 className="card__title">Distribución del día</h3>
+                <span className="card__count">
+                  {new Date(`${fecha}T00:00:00`).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </span>
+              </div>
+            </div>
+            <div className="chart-card__body--sm" style={{ height: 210, padding: '12px 4px 8px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData} cx="50%" cy="50%"
+                    innerRadius="48%" outerRadius="72%"
+                    dataKey="value" nameKey="name" paddingAngle={3}
+                  >
+                    {pieData.map((d, i) => <Cell key={i} fill={d.color} stroke="none" />)}
+                  </Pie>
+                  <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: '#CBD5E1' }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: '#94A3B8' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="card attendance-card">
         <div className="card__header">

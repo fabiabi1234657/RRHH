@@ -99,6 +99,9 @@ export const obtenerReporteHeadcountAPI = () =>
 export const obtenerResumenEmpleadoAPI = (employeeId) =>
   peticion('GET', `/reports/employee/${employeeId}/summary`);
 
+export const obtenerTendenciaAsistenciaAPI = (months = 5) =>
+  peticion('GET', `/reports/attendance/trend?months=${months}`);
+
 /* DEPARTAMENTOS — /departamentos */
 export const obtenerDepartamentosAPI = () =>
   peticion('GET', '/departamentos');
