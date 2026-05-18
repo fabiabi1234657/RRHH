@@ -8,6 +8,12 @@ import {
   updateProfile,
   recoverPassword
 } from '../controllers/authController.js';
+import {
+  setupMfa,
+  enableMfa,
+  disableMfa,
+  verifyMfaLogin
+} from '../controllers/mfaController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import { authorize } from '../middlewares/roleMiddleware.js';
 
@@ -155,5 +161,11 @@ router.post('/logout', logout);
  */
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
+
+// === MFA / TOTP ===
+router.post('/mfa/setup', protect, setupMfa);
+router.post('/mfa/enable', protect, enableMfa);
+router.post('/mfa/disable', protect, disableMfa);
+router.post('/mfa/verify-login', verifyMfaLogin);
 
 export default router;

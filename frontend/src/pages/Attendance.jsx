@@ -3,6 +3,7 @@ import { obtenerAsistenciaPorFechaAPI, obtenerEmpleadosAPI } from '../services/a
 import Alert from '../components/ui/Alert';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import Pagination from '../components/ui/Pagination';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const IcoRefresh = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>;
@@ -36,6 +37,9 @@ export default function Attendance() {
   const [asistencias, setAsistencias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [pagina, setPagina] = useState(1);
+
+  const ATT_PAGE = 25;
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -66,6 +70,11 @@ export default function Attendance() {
     empleado,
     registro: asistenciasPorEmpleado.get(empleado._id),
   })), [empleados, asistenciasPorEmpleado]);
+
+  /* Resetear página cuando cambia la fecha */
+  useEffect(() => { setPagina(1); }, [fecha]);
+
+  const pagFilas = filas.slice((pagina - 1) * ATT_PAGE, pagina * ATT_PAGE);
 
   const resumen = useMemo(() => {
     const base = { present: 0, late: 0, absent: 0, missing: 0 };
@@ -158,7 +167,8 @@ export default function Attendance() {
             ))}
           </div>
         ) : (
-          <div className="table-wrap">
+          <>
+            <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
@@ -170,7 +180,7 @@ export default function Attendance() {
                 </tr>
               </thead>
               <tbody>
-                {filas.map(({ empleado, registro }) => {
+                {pagFilas.map(({ empleado, registro }) => {
                   const meta = estadoMeta[registro?.status ?? 'missing'];
                   return (
                     <tr key={empleado._id}>
@@ -185,6 +195,13 @@ export default function Attendance() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            page={pagina}
+            total={filas.length}
+            pageSize={ATT_PAGE}
+            onChange={setPagina}
+          />
+          </>
         )}
       </section>
     </div>

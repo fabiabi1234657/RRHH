@@ -30,6 +30,8 @@ services:
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:80}
     env_file:
       - ./backend/.env
+    volumes:
+      - backend_uploads:/app/uploads
 
   frontend:
     build:
@@ -44,3 +46,4 @@ services:
 
 volumes:
   mongo_data:
+  backend_uploads:

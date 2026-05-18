@@ -6,6 +6,7 @@ import Badge  from '../components/ui/Badge';
 import Alert  from '../components/ui/Alert';
 import Modal  from '../components/ui/Modal';
 import Button from '../components/ui/Button';
+import MfaSection from '../components/ui/MfaSection';
 import { toast } from '../stores/useToastStore';
 
 /* -- Icono de usuario -- */
@@ -248,6 +249,11 @@ export default function MyProfile() {
               />
             </div>
           </div>
+
+          <MfaSection
+            mfaEnabled={!!usuario.mfaEnabled}
+            onChange={async () => { await refrescarPerfil(); await cargarPerfil(); }}
+          />
 
         </>
       )}

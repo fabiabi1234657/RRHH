@@ -1,38 +1,62 @@
 import { create } from 'zustand';
 
-let nextId = 1;
+let nextId  = 1;
+const LEAVE_MS  = 280;  // debe coincidir con CSS toastOut
+const DEDUP_MS  = 800;  // ignora notificaciones idénticas dentro de este intervalo
+
+// Timers fuera del store (evita condiciones de carrera con set() de Zustand)
+let autoTimer  = null;
+let leaveTimer = null;
+let lastKey    = '';
+let lastTime   = 0;
 
 export const useToastStore = create((set, get) => ({
-  toasts: [],
+  toast: null, // un solo toast activo a la vez
 
-  /**
-   * Muestra una notificacion toast.
-   * @param {Object} opts
-   * @param {'success'|'error'|'warning'|'info'} [opts.type='info']
-   * @param {string} [opts.title]
-   * @param {string} [opts.msg]
-   * @param {number} [opts.duration=4500]  ms (0 = no auto-cerrar)
-   */
-  push: (opts = {}) => {
+  push(opts = {}) {
+    const type     = opts.type  || 'info';
+    const title    = opts.title || '';
+    const msg      = opts.msg   || '';
+    const duration = opts.duration ?? 4500;
+
+    // Rate-limit: descarta notificaciones idénticas en rápida sucesión
+    const key = `${type}|${title}|${msg}`;
+    const now = Date.now();
+    if (key === lastKey && now - lastTime < DEDUP_MS) return;
+    lastKey  = key;
+    lastTime = now;
+
+    // Cancela timers pendientes del toast anterior
+    clearTimeout(autoTimer);
+    clearTimeout(leaveTimer);
+    autoTimer  = null;
+    leaveTimer = null;
+
     const id = nextId++;
-    const toast = {
-      id,
-      type: opts.type || 'info',
-      title: opts.title || '',
-      msg: opts.msg || '',
-      duration: opts.duration ?? 4500,
-    };
-    set((s) => ({ toasts: [...s.toasts, toast] }));
-    if (toast.duration > 0) {
-      setTimeout(() => get().dismiss(id), toast.duration);
+    set({ toast: { id, type, title, msg, duration, leaving: false } });
+
+    if (duration > 0) {
+      autoTimer = setTimeout(() => get().dismiss(), duration);
     }
     return id;
   },
 
-  dismiss: (id) =>
-    set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
+  dismiss() {
+    const { toast: t } = get();
+    if (!t || t.leaving) return;
+    clearTimeout(autoTimer);
+    autoTimer = null;
+    set((s) => ({ toast: s.toast ? { ...s.toast, leaving: true } : null }));
+    leaveTimer = setTimeout(() => set({ toast: null }), LEAVE_MS);
+  },
 
-  clear: () => set({ toasts: [] }),
+  clear() {
+    clearTimeout(autoTimer);
+    clearTimeout(leaveTimer);
+    autoTimer  = null;
+    leaveTimer = null;
+    set({ toast: null });
+  },
 }));
 
 // Helpers de conveniencia
@@ -46,3 +70,4 @@ export const toast = {
   info: (title, msg, duration) =>
     useToastStore.getState().push({ type: 'info', title, msg, duration }),
 };
+

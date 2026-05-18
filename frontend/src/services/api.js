@@ -149,3 +149,42 @@ export const actualizarEmpleadoAPI = (id, datos) =>
 
 export const eliminarEmpleadoAPI = (id) =>
   peticion('DELETE', `/empleados/${id}`);
+
+/* DOCUMENTOS DE EMPLEADO */
+export const listarDocumentosEmpleadoAPI = (employeeId) =>
+  peticion('GET', `/empleados/${employeeId}/documents`);
+
+export const subirDocumentoEmpleadoAPI = async (employeeId, formData) => {
+  try {
+    const respuesta = await api.post(
+      `/empleados/${employeeId}/documents`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    return respuesta.data;
+  } catch (error) {
+    throw new Error(extraerMensaje(error));
+  }
+};
+
+export const descargarDocumentoURL = (documentId) => `/api/documents/${documentId}`;
+
+export const eliminarDocumentoAPI = (documentId) =>
+  peticion('DELETE', `/documents/${documentId}`);
+
+/* ALERTAS RRHH */
+export const obtenerAlertasAPI = (days = 30) =>
+  peticion('GET', `/reports/alerts?days=${days}`);
+
+/* MFA / 2FA */
+export const setupMfaAPI = () =>
+  peticion('POST', '/auth/mfa/setup');
+
+export const enableMfaAPI = (token) =>
+  peticion('POST', '/auth/mfa/enable', { token });
+
+export const disableMfaAPI = (token) =>
+  peticion('POST', '/auth/mfa/disable', { token });
+
+export const verifyMfaLoginAPI = (mfaToken, code) =>
+  peticion('POST', '/auth/mfa/verify-login', { mfaToken, code });

@@ -306,8 +306,8 @@ a:focus-visible {
 @keyframes pulse        { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes pulseRing    { 0% { box-shadow: 0 0 0 0 var(--accent-glow); } 70% { box-shadow: 0 0 0 12px rgba(99,102,241,0); } 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); } }
 @keyframes modalIn      { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-@keyframes toastIn      { from { opacity: 0; transform: translateX(110%) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes toastOut     { to { opacity: 0; transform: translateX(110%) scale(0.96); } }
+@keyframes toastIn      { from { opacity: 0; transform: translateY(100%) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes toastOut     { to { opacity: 0; transform: translateY(100%) scale(0.96); } }
 @keyframes float        { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes gradientShift{ 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 @keyframes blink        { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -441,7 +441,7 @@ a:focus-visible {
    ============================================================ */
 .toast-container {
   position: fixed;
-  top: 24px;
+  bottom: 24px;
   right: 24px;
   z-index: 9999;
   display: flex;
@@ -452,7 +452,7 @@ a:focus-visible {
 }
 @media (max-width: 600px) {
   .toast-container {
-    top: 12px;
+    bottom: 12px;
     right: 12px;
     left: 12px;
     width: auto;
@@ -2067,6 +2067,107 @@ a:focus-visible {
   align-items: center;
   gap: 14px;
   margin-bottom: 18px;
+}
+
+/* ── Barra compacta de empleados (stats + búsqueda) ──────────────────────── */
+.emp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.emp-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.emp-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  cursor: default;
+  white-space: nowrap;
+}
+.emp-chip--green { border-color: #10B98130; background: #10B98112; }
+.emp-chip--orange { border-color: #F59E0B30; background: #F59E0B12; }
+
+.emp-chip__num {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.emp-chip--green  .emp-chip__num { color: #10B981; }
+.emp-chip--orange .emp-chip__num { color: #F59E0B; }
+
+.emp-chip__lbl {
+  font-size: 11.5px;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+/* ── Paginación ─────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 0 4px;
+  flex-wrap: wrap;
+}
+.pagination__info {
+  font-size: 12px;
+  color: var(--text2);
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.pagination__btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+.pagination__btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.pagination__btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.pagination__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.pagination__ellipsis {
+  min-width: 28px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text2);
 }
 
 /* Contador de resultados */

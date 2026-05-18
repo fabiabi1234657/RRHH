@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import { loginAPI, logoutAPI, obtenerPerfilAPI } from '../services/api';
+import {
+  loginAPI,
+  logoutAPI,
+  obtenerPerfilAPI,
+  verifyMfaLoginAPI
+} from '../services/api';
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -21,21 +26,49 @@ export const useAuthStore = create((set, get) => ({
     ...updates,
   })),
 
+  /**
+   * Inicia sesión. Si la cuenta tiene MFA, devuelve:
+   *   { mfaRequired: true, mfaToken }
+   * En caso contrario devuelve:
+   *   { user }
+   */
   login: async (email, password) => {
     set({ loading: true, error: null });
     try {
       const data = await loginAPI(email, password);
+
+      if (data.mfaRequired) {
+        set({ loading: false });
+        return { mfaRequired: true, mfaToken: data.mfaToken };
+      }
+
       if (!data.success || !data.user) {
         throw new Error(data.message || 'Credenciales invalidas');
       }
       get().setSession(data.user);
       set({ loading: false });
-      return data.user;
+      return { user: data.user };
     } catch (error) {
       get().clearSession({
         loading: false,
         error: error.message,
       });
+      throw error;
+    }
+  },
+
+  verifyMfaLogin: async (mfaToken, code) => {
+    set({ loading: true, error: null });
+    try {
+      const data = await verifyMfaLoginAPI(mfaToken, code);
+      if (!data.success || !data.user) {
+        throw new Error(data.message || 'Código inválido');
+      }
+      get().setSession(data.user);
+      set({ loading: false });
+      return data.user;
+    } catch (error) {
+      set({ loading: false, error: error.message });
       throw error;
     }
   },

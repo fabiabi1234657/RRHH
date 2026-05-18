@@ -7,12 +7,13 @@ import {
   obtenerDepartamentosAPI,
   obtenerPosicionesAPI,
 } from '../services/api';
-import Modal  from '../components/ui/Modal';
-import Button from '../components/ui/Button';
-import Badge  from '../components/ui/Badge';
-import Alert  from '../components/ui/Alert';
+import Modal      from '../components/ui/Modal';
+import Button     from '../components/ui/Button';
+import Badge      from '../components/ui/Badge';
+import Alert      from '../components/ui/Alert';
+import Pagination from '../components/ui/Pagination';
+import EmployeeDocumentsModal from '../components/ui/EmployeeDocumentsModal';
 import { toast } from '../stores/useToastStore';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 /* -- Iconos -- */
 const IcoEdit = () => (
@@ -76,6 +77,9 @@ function FormEmpleado({ inicial, departamentos, posiciones, guardando, error, on
     department: '',
     hireDate: new Date().toISOString().slice(0, 10),
     status: 'active',
+    trialEndDate: '',
+    contractEndDate: '',
+    dataPolicySignedAt: '',
     ...inicial,
   });
 
@@ -146,6 +150,33 @@ function FormEmpleado({ inicial, departamentos, posiciones, guardando, error, on
         </div>
       </div>
 
+      <div className="emp-form__row">
+        <div className="field">
+          <label className="field__label" htmlFor="ef-trialEndDate">Fin de periodo de prueba</label>
+          <input
+            id="ef-trialEndDate" name="trialEndDate" type="date" className="field__input"
+            value={form.trialEndDate ?? ''} onChange={cambiar}
+          />
+        </div>
+
+        <div className="field">
+          <label className="field__label" htmlFor="ef-contractEndDate">Fin de contrato</label>
+          <input
+            id="ef-contractEndDate" name="contractEndDate" type="date" className="field__input"
+            value={form.contractEndDate ?? ''} onChange={cambiar}
+          />
+        </div>
+      </div>
+
+      <div className="field">
+        <label className="field__label" htmlFor="ef-dataPolicySignedAt">Fecha de firma Habeas Data</label>
+        <input
+          id="ef-dataPolicySignedAt" name="dataPolicySignedAt" type="date" className="field__input"
+          value={form.dataPolicySignedAt ?? ''} onChange={cambiar}
+        />
+        <span className="field__hint">Política de tratamiento de datos personales firmada por el empleado.</span>
+      </div>
+
       <div className="emp-form__footer">
         <Button type="submit" variante="primary" cargando={guardando} fullWidth>
           {inicial?._id ? 'Guardar cambios' : 'Crear empleado'}
@@ -168,6 +199,10 @@ export default function GestionEmpleados() {
   const [eliminando, setEliminando]       = useState(null);
   const [guardando, setGuardando]         = useState(false);
   const [errorAccion, setErrorAccion]     = useState(null);
+  const [docsDe, setDocsDe]               = useState(null);
+  const [pagina, setPagina]               = useState(1);
+
+  const EMP_PAGE = 25;
 
   const cargar = useCallback(async () => {
     setCargando(true); setError(null);
@@ -197,10 +232,25 @@ export default function GestionEmpleados() {
     return nombre.toLowerCase().includes(q) || cargo.toLowerCase().includes(q) || dept.toLowerCase().includes(q);
   });
 
-  const crearEmpleado = async ({ userId, position, department, hireDate, status }) => {
+  /* Resetear a página 1 cuando cambia la búsqueda */
+  useEffect(() => { setPagina(1); }, [busqueda]);
+
+  const pagEmps = filtrados.slice((pagina - 1) * EMP_PAGE, pagina * EMP_PAGE);
+
+  const limpiarFechas = (obj) => {
+    const out = { ...obj };
+    ['trialEndDate', 'contractEndDate', 'dataPolicySignedAt'].forEach((k) => {
+      if (out[k] === '' || out[k] == null) delete out[k];
+    });
+    return out;
+  };
+
+  const crearEmpleado = async (form) => {
     setGuardando(true); setErrorAccion(null);
     try {
-      await crearEmpleadoAPI({ userId, position, department, hireDate, status });
+      const { userId, position, department, hireDate, status, trialEndDate, contractEndDate, dataPolicySignedAt } = form;
+      const payload = limpiarFechas({ userId, position, department, hireDate, status, trialEndDate, contractEndDate, dataPolicySignedAt });
+      await crearEmpleadoAPI(payload);
       setModalCrear(false);
       toast.success('Empleado registrado', 'El perfil del empleado fue creado exitosamente.');
       await cargar();
@@ -210,10 +260,12 @@ export default function GestionEmpleados() {
     } finally { setGuardando(false); }
   };
 
-  const actualizarEmpleado = async ({ position, department, hireDate, status }) => {
+  const actualizarEmpleado = async (form) => {
     setGuardando(true); setErrorAccion(null);
     try {
-      await actualizarEmpleadoAPI(editando._id, { position, department, hireDate, status });
+      const { position, department, hireDate, status, trialEndDate, contractEndDate, dataPolicySignedAt } = form;
+      const payload = limpiarFechas({ position, department, hireDate, status, trialEndDate, contractEndDate, dataPolicySignedAt });
+      await actualizarEmpleadoAPI(editando._id, payload);
       setEditando(null);
       toast.success('Empleado actualizado', 'Los datos del perfil fueron guardados.');
       await cargar();
@@ -240,12 +292,8 @@ export default function GestionEmpleados() {
     ? new Date(iso).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' })
     : '-';
 
-  const estadoData = useMemo(() => [
-    { name: 'Activos',   value: empleados.filter(e => e.status === 'active').length },
-    { name: 'Inactivos', value: empleados.filter(e => e.status === 'inactive').length },
-  ].filter(d => d.value > 0), [empleados]);
-
-  const TT_STYLE = { background: '#1A2238', border: '1px solid #2A3450', borderRadius: 8, color: '#F1F5F9', fontSize: 12 };
+  const totalActivos  = useMemo(() => empleados.filter(e => e.status === 'active').length,   [empleados]);
+  const totalInactivos = useMemo(() => empleados.filter(e => e.status !== 'active').length, [empleados]);
 
   const resolverNombre = emp => {
     const u = emp.userId;
@@ -261,6 +309,9 @@ export default function GestionEmpleados() {
     department: typeof emp.department === 'object' ? emp.department?._id : emp.department ?? '',
     hireDate:   emp.hireDate ? emp.hireDate.slice(0, 10) : '',
     status:     emp.status ?? 'active',
+    trialEndDate:       emp.trialEndDate       ? emp.trialEndDate.slice(0, 10)       : '',
+    contractEndDate:    emp.contractEndDate    ? emp.contractEndDate.slice(0, 10)    : '',
+    dataPolicySignedAt: emp.dataPolicySignedAt ? emp.dataPolicySignedAt.slice(0, 10) : '',
   });
 
   return (
@@ -278,39 +329,25 @@ export default function GestionEmpleados() {
         </Button>
       </div>
 
-      {/* Mini donut: estado del personal */}
-      {!cargando && estadoData.length > 0 && (
-        <div className="chart-row--single">
-          <div className="card chart-card">
-            <div className="card__header">
-              <div className="card__header-left">
-                <h3 className="card__title">Estado del personal</h3>
-                <span className="card__count">{empleados.length} registros totales</span>
-              </div>
+      {/* Barra compacta: stats + búsqueda */}
+      <div className="emp-toolbar">
+        {!cargando && (
+          <div className="emp-chips">
+            <div className="emp-chip">
+              <span className="emp-chip__num">{empleados.length}</span>
+              <span className="emp-chip__lbl">Total</span>
             </div>
-            <div className="chart-card__body--sm" style={{ height: 200, padding: '12px 4px 8px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={estadoData} cx="50%" cy="50%"
-                    innerRadius="48%" outerRadius="72%"
-                    dataKey="value" nameKey="name" paddingAngle={4}
-                  >
-                    <Cell fill="#10B981" stroke="none" />
-                    <Cell fill="#F59E0B" stroke="none" />
-                  </Pie>
-                  <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: '#CBD5E1' }} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: '#94A3B8' }} />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="emp-chip emp-chip--green">
+              <span className="emp-chip__num">{totalActivos}</span>
+              <span className="emp-chip__lbl">Activos</span>
+            </div>
+            <div className="emp-chip emp-chip--orange">
+              <span className="emp-chip__num">{totalInactivos}</span>
+              <span className="emp-chip__lbl">Inactivos</span>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Barra de busqueda + contador */}
-      <div className="dept-toolbar">
-        <div className="search-bar">
+        )}
+        <div className="search-bar" style={{ flex: 1 }}>
           <span className="search-bar__icon"><IcoSearch /></span>
           <input
             className="search-bar__input"
@@ -361,8 +398,9 @@ export default function GestionEmpleados() {
               </p>
             </div>
           ) : (
-            <div className="table-wrap">
-              <table className="table">
+            <>
+              <div className="table-wrap">
+                <table className="table" style={{ minWidth: 0 }}>
                 <thead>
                   <tr>
                     <th>Empleado</th>
@@ -374,7 +412,7 @@ export default function GestionEmpleados() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtrados.map(emp => {
+                  {pagEmps.map(emp => {
                     const nombre = resolverNombre(emp);
                     const cargoNombre = typeof emp.position === 'object'
                       ? emp.position?.title
@@ -410,6 +448,10 @@ export default function GestionEmpleados() {
                         </td>
                         <td>
                           <div className="table__actions" style={{ justifyContent: 'flex-end' }}>
+                            <button className="table__btn" title="Documentos"
+                              onClick={() => setDocsDe(emp)}>
+                              📎
+                            </button>
                             <button className="table__btn table__btn--edit" title="Editar"
                               onClick={() => { setErrorAccion(null); setEditando(emp); }}>
                               <IcoEdit />
@@ -426,6 +468,13 @@ export default function GestionEmpleados() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              page={pagina}
+              total={filtrados.length}
+              pageSize={EMP_PAGE}
+              onChange={setPagina}
+            />
+            </>
           )}
         </div>
       )}
@@ -477,6 +526,15 @@ export default function GestionEmpleados() {
             <p className="dept-confirm__warn">Esta accion no se puede deshacer.</p>
           </div>
         </Modal>
+      )}
+
+      {/* Modal: Documentos del empleado */}
+      {docsDe && (
+        <EmployeeDocumentsModal
+          employeeId={docsDe._id}
+          employeeName={resolverNombre(docsDe)}
+          onClose={() => setDocsDe(null)}
+        />
       )}
     </div>
   );

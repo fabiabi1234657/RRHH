@@ -22,7 +22,7 @@ const IcoBack   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="no
 
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, verifyMfaLogin } = useAuth();
   const navigate  = useNavigate();
 
   const [email,    setEmail]    = useState('');
@@ -30,6 +30,18 @@ export default function Login() {
   const [verPass,  setVerPass]  = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error,    setError]    = useState('');
+
+  // Estado del paso MFA
+  const [mfaToken, setMfaToken] = useState('');
+  const [mfaCode,  setMfaCode]  = useState('');
+
+  const irPorRol = (usuario) => {
+    toast.success('¡Bienvenido de vuelta!', `Hola, ${usuario.name || 'usuario'}. Sesión iniciada correctamente.`);
+    navigate(
+      usuario.role === 'admin' ? '/app/dashboard' : '/app/mi-perfil',
+      { replace: true }
+    );
+  };
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
@@ -40,13 +52,15 @@ export default function Login() {
     setError('');
     setCargando(true);
     try {
-      const usuario = await login(email.trim(), password);
+      const resultado = await login(email.trim(), password);
 
-      toast.success('¡Bienvenido de vuelta!', `Hola, ${usuario.name || 'usuario'}. Sesión iniciada correctamente.`);
-      navigate(
-        usuario.role === 'admin' ? '/app/dashboard' : '/app/mi-perfil',
-        { replace: true }
-      );
+      if (resultado?.mfaRequired) {
+        setMfaToken(resultado.mfaToken);
+        toast.info('Verificación en dos pasos', 'Ingresa el código de tu app autenticadora.');
+        return;
+      }
+
+      irPorRol(resultado.user);
     } catch (err) {
       const msg = err.message || 'Error al iniciar sesion';
       toast.error('Error al iniciar sesión', msg);
@@ -54,6 +68,32 @@ export default function Login() {
     } finally {
       setCargando(false);
     }
+  };
+
+  const manejarVerificarMfa = async (e) => {
+    e.preventDefault();
+    if (!mfaCode.trim()) {
+      setError('Ingresa el código de 6 dígitos.');
+      return;
+    }
+    setError('');
+    setCargando(true);
+    try {
+      const usuario = await verifyMfaLogin(mfaToken, mfaCode.trim());
+      irPorRol(usuario);
+    } catch (err) {
+      const msg = err.message || 'Código inválido';
+      toast.error('Verificación fallida', msg);
+      setError(msg);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const cancelarMfa = () => {
+    setMfaToken('');
+    setMfaCode('');
+    setError('');
   };
 
   return (
@@ -124,8 +164,14 @@ export default function Login() {
 
           {/* Titulo */}
           <div className="login-card__header">
-            <h2 className="login-card__title">Bienvenido</h2>
-            <p className="login-card__sub">Ingresa tus credenciales para continuar</p>
+            <h2 className="login-card__title">
+              {mfaToken ? 'Verificación en dos pasos' : 'Bienvenido'}
+            </h2>
+            <p className="login-card__sub">
+              {mfaToken
+                ? 'Ingresa el código de 6 dígitos de tu app autenticadora.'
+                : 'Ingresa tus credenciales para continuar'}
+            </p>
           </div>
 
           {/* Error */}
@@ -135,63 +181,109 @@ export default function Login() {
             </Alert>
           )}
 
-          {/* Formulario */}
-          <form className="login-form" onSubmit={manejarEnvio} noValidate>
-            <div className="field">
-              <label htmlFor="email" className="field__label">Correo electronico</label>
-              <input
-                id="email"
-                type="email"
-                className="field__input"
-                placeholder="usuario@empresa.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-                autoFocus
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="password" className="field__label">Contrasena</label>
-              <div className="field__input-wrap">
+          {/* Formulario de credenciales */}
+          {!mfaToken && (
+            <form className="login-form" onSubmit={manejarEnvio} noValidate>
+              <div className="field">
+                <label htmlFor="email" className="field__label">Correo electronico</label>
                 <input
-                  id="password"
-                  type={verPass ? 'text' : 'password'}
+                  id="email"
+                  type="email"
                   className="field__input"
-                  placeholder="Ingresa tu contrasena"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
+                  placeholder="usuario@empresa.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
                   required
+                  autoFocus
                 />
-                <button
-                  type="button"
-                  className="field__eye"
-                  onClick={() => setVerPass(v => !v)}
-                  aria-label={verPass ? 'Ocultar contrasena' : 'Mostrar contrasena'}
-                >
-                  {verPass ? <IcoEyeOff /> : <IcoEye />}
-                </button>
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              variante="primary"
-              size="lg"
-              fullWidth
-              cargando={cargando}
-            >
-              {cargando ? 'Verificando...' : 'Iniciar Sesion'}
-            </Button>
-          </form>
+              <div className="field">
+                <label htmlFor="password" className="field__label">Contrasena</label>
+                <div className="field__input-wrap">
+                  <input
+                    id="password"
+                    type={verPass ? 'text' : 'password'}
+                    className="field__input"
+                    placeholder="Ingresa tu contrasena"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="field__eye"
+                    onClick={() => setVerPass(v => !v)}
+                    aria-label={verPass ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  >
+                    {verPass ? <IcoEyeOff /> : <IcoEye />}
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                variante="primary"
+                size="lg"
+                fullWidth
+                cargando={cargando}
+              >
+                {cargando ? 'Verificando...' : 'Iniciar Sesion'}
+              </Button>
+            </form>
+          )}
+
+          {/* Formulario de MFA */}
+          {mfaToken && (
+            <form className="login-form" onSubmit={manejarVerificarMfa} noValidate>
+              <div className="field">
+                <label htmlFor="mfaCode" className="field__label">Código TOTP</label>
+                <input
+                  id="mfaCode"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  className="field__input"
+                  placeholder="123456"
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                  required
+                  autoFocus
+                />
+              </div>
+
+              <Button
+                type="submit"
+                variante="primary"
+                size="lg"
+                fullWidth
+                cargando={cargando}
+              >
+                {cargando ? 'Verificando...' : 'Verificar código'}
+              </Button>
+
+              <Button
+                type="button"
+                variante="ghost"
+                size="md"
+                fullWidth
+                onClick={cancelarMfa}
+              >
+                Cancelar
+              </Button>
+            </form>
+          )}
 
           {/* Recuperar contrasena */}
-          <p className="login-card__footer">
-            Olvidaste tu contrasena?{' '}
-            <Link to="/recuperar-contrasena" className="field__link">Recuperar acceso</Link>
-          </p>
+          {!mfaToken && (
+            <p className="login-card__footer">
+              Olvidaste tu contrasena?{' '}
+              <Link to="/recuperar-contrasena" className="field__link">Recuperar acceso</Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

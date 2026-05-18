@@ -53,14 +53,26 @@ export const getEmployeeById = async (req, res) => {
 // Crear nuevo empleado
 export const createEmployee = async (req, res) => {
   try {
-    const { userId, position, department, hireDate, status } = req.body;
+    const {
+      userId,
+      position,
+      department,
+      hireDate,
+      status,
+      trialEndDate,
+      contractEndDate,
+      dataPolicySignedAt
+    } = req.body;
 
     const employee = new Employee({
       userId,
       position,
       department,
       hireDate: hireDate || new Date(),
-      status: status || 'active'
+      status: status || 'active',
+      trialEndDate: trialEndDate || null,
+      contractEndDate: contractEndDate || null,
+      dataPolicySignedAt: dataPolicySignedAt || null
     });
 
     await employee.save();
@@ -86,7 +98,15 @@ export const createEmployee = async (req, res) => {
 // Actualizar empleado
 export const updateEmployee = async (req, res) => {
   try {
-    const { position, department, hireDate, status } = req.body;
+    const {
+      position,
+      department,
+      hireDate,
+      status,
+      trialEndDate,
+      contractEndDate,
+      dataPolicySignedAt
+    } = req.body;
 
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
@@ -94,7 +114,10 @@ export const updateEmployee = async (req, res) => {
         ...(position && { position }),
         ...(department && { department }),
         ...(hireDate && { hireDate }),
-        ...(status && { status })
+        ...(status && { status }),
+        ...(trialEndDate !== undefined && { trialEndDate: trialEndDate || null }),
+        ...(contractEndDate !== undefined && { contractEndDate: contractEndDate || null }),
+        ...(dataPolicySignedAt !== undefined && { dataPolicySignedAt: dataPolicySignedAt || null })
       },
       { new: true, runValidators: true }
     )
