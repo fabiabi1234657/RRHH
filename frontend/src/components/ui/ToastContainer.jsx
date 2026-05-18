@@ -51,43 +51,42 @@ const ICONS = {
 };
 
 export default function ToastContainer() {
-  const toasts  = useToastStore((s) => s.toasts);
+  const t       = useToastStore((s) => s.toast);
   const dismiss = useToastStore((s) => s.dismiss);
 
-  if (!toasts.length) return null;
+  if (!t) return null;
 
   return (
     <div className="toast-container" role="region" aria-live="polite" aria-label="Notificaciones">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          className={`toast toast--${t.type}`}
-          role={t.type === 'error' ? 'alert' : 'status'}
-        >
-          <span className="toast__icon" aria-hidden="true">
-            {ICONS[t.type] ?? ICONS.info}
-          </span>
-          <div className="toast__body">
-            {t.title && <div className="toast__title">{t.title}</div>}
-            {t.msg   && <div className="toast__msg">{t.msg}</div>}
-          </div>
-          <button
-            type="button"
-            className="toast__close"
-            onClick={() => dismiss(t.id)}
-            aria-label="Cerrar notificación"
-          >
-            <IconClose />
-          </button>
-          {t.duration > 0 && (
-            <span
-              className="toast__progress"
-              style={{ animationDuration: `${t.duration}ms` }}
-              aria-hidden="true"
-            />
-          )}
+      <div
+        key={t.id}
+        className={`toast toast--${t.type}${t.leaving ? ' toast--leaving' : ''}`}
+        role={t.type === 'error' ? 'alert' : 'status'}
+      >
+        <span className="toast__icon" aria-hidden="true">
+          {ICONS[t.type] ?? ICONS.info}
+        </span>
+        <div className="toast__body">
+          {t.title && <div className="toast__title">{t.title}</div>}
+          {t.msg   && <div className="toast__msg">{t.msg}</div>}
         </div>
-      ))}
+        <button
+          type="button"
+          className="toast__close"
+          onClick={() => dismiss()}
+          aria-label="Cerrar notificación"
+        >
+          <IconClose />
+        </button>
+        {t.duration > 0 && (
+          <span
+            className="toast__progress"
+            style={{ animationDuration: `${t.duration}ms` }}
+            aria-hidden="true"
+          />
+        )}
+      </div>
     </div>
   );
 }
+

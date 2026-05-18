@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import { buildMfaPendingResponse } from './mfaController.js';
 
 // Función para generar JWT
 const generateToken = (id) => {
@@ -143,6 +144,12 @@ export const login = async (req, res) => {
       });
     }
 
+    // Si el usuario tiene MFA habilitado, NO se emite cookie aún.
+    // Se devuelve un token temporal para completar el segundo factor.
+    if (user.mfaEnabled) {
+      return res.json(buildMfaPendingResponse(user));
+    }
+
     // Generar token
     const token = generateToken(user._id);
 
@@ -205,6 +212,7 @@ export const getProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        mfaEnabled: user.mfaEnabled,
         createdAt: user.createdAt
       }
     });

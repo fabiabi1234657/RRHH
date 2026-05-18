@@ -28,6 +28,23 @@ const employeeSchema = new mongoose.Schema(
       enum: ['active', 'inactive'],
       default: 'active'
     },
+    // === Campos para gestión documental y legal ===
+    // Fin del periodo de prueba (alerta antes de vencer)
+    trialEndDate: {
+      type: Date,
+      default: null
+    },
+    // Fin de contrato (alerta antes de vencer)
+    contractEndDate: {
+      type: Date,
+      default: null
+    },
+    // Fecha de firma de política de Habeas Data
+    // null = pendiente de firma
+    dataPolicySignedAt: {
+      type: Date,
+      default: null
+    },
     createdAt: {
       type: Date,
       default: Date.now

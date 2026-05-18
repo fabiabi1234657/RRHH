@@ -27,6 +27,16 @@ const userSchema = new mongoose.Schema(
       enum: ['employee', 'admin'],
       default: 'employee'
     },
+    // === MFA / TOTP (Google Authenticator) ===
+    mfaEnabled: {
+      type: Boolean,
+      default: false
+    },
+    mfaSecret: {
+      type: String,
+      select: false,
+      default: null
+    },
     createdAt: {
       type: Date,
       default: Date.now

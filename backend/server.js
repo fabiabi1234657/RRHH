@@ -14,6 +14,7 @@ import attendanceRoutes from './src/routes/attendanceRoutes.js';
 import employeeRoutes from './src/routes/employeeRoutes.js';
 import departmentRoutes from './src/routes/departmentRoutes.js';
 import positionRoutes from './src/routes/positionRoutes.js';
+import documentRoutes from './src/routes/documentRoutes.js';
 
 // Cargar variables de entorno desde .env usando ruta absoluta
 const __filename = fileURLToPath(import.meta.url);
@@ -54,6 +55,8 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/empleados', employeeRoutes);
 app.use('/api/departamentos', departmentRoutes);
 app.use('/api/cargos', positionRoutes);
+// Documentos: rutas anidadas /api/empleados/:id/documents y /api/documents/:id
+app.use('/api', documentRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

@@ -3,7 +3,10 @@ import { obtenerMiAsistenciaAPI, registrarEntradaAPI, registrarSalidaAPI } from 
 import Alert from '../components/ui/Alert';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import Pagination from '../components/ui/Pagination';
 import { toast } from '../stores/useToastStore';
+
+const MY_ATT_PAGE = 25;
 
 const IcoIn = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>;
 const IcoOut = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>;
@@ -28,6 +31,7 @@ export default function MyAttendance() {
   const [cargando, setCargando] = useState(true);
   const [accionando, setAccionando] = useState(false);
   const [error, setError] = useState('');
+  const [pagina, setPagina] = useState(1);
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -111,7 +115,10 @@ export default function MyAttendance() {
       <section className="card">
         <div className="card__header"><div className="card__header-left"><h3 className="card__title">Historial reciente</h3><span className="card__count">{attendance.length} registros cargados</span></div></div>
         {cargando ? <div className="dept-skeleton">{[1, 2, 3, 4].map((item) => <div key={item} className="dept-skeleton__row"><div className="skeleton" style={{ width: '70%', height: 14 }} /></div>)}</div> : (
-          <div className="table-wrap"><table className="table"><thead><tr><th>Fecha</th><th>Estado</th><th>Entrada</th><th>Salida</th></tr></thead><tbody>{attendance.map((item) => { const meta = estadoMeta[item.status] ?? estadoMeta.present; return <tr key={item._id}><td><span className="table__primary">{new Date(item.date).toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}</span><span className="table__secondary">{new Date(item.date).getFullYear()}</span></td><td><Badge texto={meta.label} tipo={meta.tipo} dot /></td><td><span className="table__mono">{hora(item.checkIn)}</span></td><td><span className="table__mono">{hora(item.checkOut)}</span></td></tr>; })}</tbody></table></div>
+          <>
+            <div className="table-wrap"><table className="table"><thead><tr><th>Fecha</th><th>Estado</th><th>Entrada</th><th>Salida</th></tr></thead><tbody>{attendance.slice((pagina - 1) * MY_ATT_PAGE, pagina * MY_ATT_PAGE).map((item) => { const meta = estadoMeta[item.status] ?? estadoMeta.present; return <tr key={item._id}><td><span className="table__primary">{new Date(item.date).toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}</span><span className="table__secondary">{new Date(item.date).getFullYear()}</span></td><td><Badge texto={meta.label} tipo={meta.tipo} dot /></td><td><span className="table__mono">{hora(item.checkIn)}</span></td><td><span className="table__mono">{hora(item.checkOut)}</span></td></tr>; })}</tbody></table></div>
+            <Pagination page={pagina} total={attendance.length} pageSize={MY_ATT_PAGE} onChange={setPagina} />
+          </>
         )}
       </section>
     </div>

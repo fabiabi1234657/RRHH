@@ -19,6 +19,7 @@ import { useCatalogStore } from '../stores/useCatalogStore';
 import { obtenerEmpleadosAPI } from '../services/api';
 import StatCard from '../components/ui/StatCard';
 import Badge    from '../components/ui/Badge';
+import AlertsWidget from '../components/ui/AlertsWidget';
 import {
   PieChart, Pie, Cell,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -185,6 +186,9 @@ export default function Dashboard() {
           color="purple"
         />
       </div>
+
+      {/* -- Widget de alertas (contratos / prueba / Habeas Data) -- */}
+      <AlertsWidget days={30} />
 
       {/* -- Layout de dos columnas -- */}
       <div className="dash__cols">

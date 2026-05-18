@@ -235,3 +235,97 @@ export const getAttendanceTrend = async (req, res) => {
     });
   }
 };
+
+// GET /api/reports/alerts?days=30
+// Retorna alertas de RRHH: contratos próximos a vencer, periodos de prueba a punto
+// de terminar, y empleados sin firmar política de Habeas Data.
+export const getAlerts = async (req, res) => {
+  try {
+    const days = Math.min(Math.max(parseInt(req.query.days) || 30, 1), 365);
+    const now = new Date();
+    const limit = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+
+    const employees = await Employee.find({ status: 'active' })
+      .populate('userId', 'name email')
+      .populate('department', 'name')
+      .populate('position', 'title')
+      .lean();
+
+    const daysBetween = (date) => {
+      if (!date) return null;
+      const diff = new Date(date).getTime() - now.getTime();
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    };
+
+    const severity = (d) => {
+      if (d === null) return null;
+      if (d < 0) return 'expired';
+      if (d <= 7) return 'critical';
+      if (d <= 30) return 'warning';
+      return 'info';
+    };
+
+    const contracts = [];
+    const trials = [];
+    const policies = [];
+
+    employees.forEach((emp) => {
+      const base = {
+        employeeId: emp._id,
+        name: emp.userId?.name || 'Sin nombre',
+        email: emp.userId?.email || '',
+        position: emp.position?.title || '',
+        department: emp.department?.name || ''
+      };
+
+      if (emp.contractEndDate && new Date(emp.contractEndDate) <= limit) {
+        const d = daysBetween(emp.contractEndDate);
+        contracts.push({
+          ...base,
+          type: 'contract',
+          date: emp.contractEndDate,
+          daysLeft: d,
+          severity: severity(d)
+        });
+      }
+
+      if (emp.trialEndDate && new Date(emp.trialEndDate) <= limit) {
+        const d = daysBetween(emp.trialEndDate);
+        trials.push({
+          ...base,
+          type: 'trial',
+          date: emp.trialEndDate,
+          daysLeft: d,
+          severity: severity(d)
+        });
+      }
+
+      if (!emp.dataPolicySignedAt) {
+        policies.push({
+          ...base,
+          type: 'habeas_data',
+          date: null,
+          daysLeft: null,
+          severity: 'warning'
+        });
+      }
+    });
+
+    return res.json({
+      success: true,
+      windowDays: days,
+      totals: {
+        contracts: contracts.length,
+        trials: trials.length,
+        policies: policies.length
+      },
+      alerts: { contracts, trials, policies }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error generando alertas',
+      error: error.message
+    });
+  }
+};

@@ -3,7 +3,8 @@ import {
   getMonthlyAttendanceReport,
   getHeadcountReport,
   getEmployeeSummary,
-  getAttendanceTrend
+  getAttendanceTrend,
+  getAlerts
 } from '../controllers/reportController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import { authorize } from '../middlewares/roleMiddleware.js';
@@ -221,5 +222,8 @@ router.get('/employee/:employeeId/summary', getEmployeeSummary);
 
 // Tendencia de asistencia mensual (últimos N meses)
 router.get('/attendance/trend', getAttendanceTrend);
+
+// Alertas de RRHH (contratos, periodos de prueba, Habeas Data)
+router.get('/alerts', getAlerts);
 
 export default router;
