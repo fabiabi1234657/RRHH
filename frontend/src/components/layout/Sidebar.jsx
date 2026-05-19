@@ -1,12 +1,12 @@
 /**
- * Sidebar.jsx - Barra lateral de navegacion principal de CorpHR.
+ * Sidebar.jsx - Barra lateral de navegación principal de CorpHR.
  *
  * Contiene:
- *  - Logo y nombre de la aplicacion
- *  - Menu de navegacion filtrado por rol del usuario
+ *  - Logo y nombre de la aplicación
+ *  - Menú de navegación filtrado por rol del usuario
  *  - Indicador de ruta activa
- *  - Seccion inferior con avatar, nombre e informacion del usuario
- *  - Boton de cierre de sesion
+ *  - Sección inferior con avatar, nombre e información del usuario
+ *  - Botón de cierre de sesión
  */
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -24,7 +24,7 @@ const IcoLogout     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill
 const IcoUserPlus   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>;
 const IcoDownload   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 
-/* -- Definicion de los items de navegacion por seccion -- */
+/* -- Definición de los items de navegación por sección -- */
 const navAdmin = [
   { to: '/app/dashboard',         label: 'Dashboard',           Icon: IcoDashboard },
   { to: '/app/empleados',         label: 'Empleados',           Icon: IcoUser      },
@@ -50,7 +50,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
     ? user.name.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase()
     : '?';
 
-  /* Manejar el cierre de sesion con redireccion al login */
+  /* Manejar el cierre de sesión con redirección al login */
   const manejarLogout = async () => {
     await logout();
     toast.info('Sesión cerrada', 'Tu sesión ha finalizado. ¡Hasta pronto!');
@@ -58,13 +58,13 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
     navigate('/login', { replace: true });
   };
 
-  /* Seleccionar el menu segun el rol */
+  /* Seleccionar el menú según el rol */
   const items = esAdmin() ? navAdmin : navEmpleado;
 
   return (
     <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
 
-      {/* -- Logo y nombre de la aplicacion -- */}
+      {/* -- Logo y nombre de la aplicación -- */}
       <div className="sidebar__brand">
         <div className="sidebar__logo">
           <span className="sidebar__logo-mark">C</span>
@@ -75,19 +75,19 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         </div>
       </div>
 
-      {/* -- Etiqueta de seccion -- */}
+      {/* -- Etiqueta de sección -- */}
       <p className="sidebar__section-label">
-        {esAdmin() ? 'Administracion' : 'Mi Espacio'}
+        {esAdmin() ? 'Administración' : 'Mi Espacio'}
       </p>
 
-      {/* -- Menu de navegacion -- */}
+      {/* -- Menú de navegación -- */}
       <nav className="sidebar__nav">
         {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             onClick={onClose}
-            /* React Router anade la clase 'active' automaticamente */
+            /* React Router añade la clase 'active' automáticamente */
             className={({ isActive }) =>
               `sidebar__link${isActive ? ' sidebar__link--active' : ''}`
             }
@@ -100,7 +100,7 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
         ))}
       </nav>
 
-      {/* Separador entre el menu y el pie */}
+      {/* Separador entre el menú y el pie */}
       <div className="sidebar__spacer" />
 
       {/* -- Pie del sidebar: info del usuario + logout -- */}
@@ -116,12 +116,12 @@ export default function Sidebar({ isOpen = false, onClose = () => {} }) {
           </span>
         </div>
 
-        {/* Boton de cierre de sesion */}
+        {/* Botón de cierre de sesión */}
         <button
           className="sidebar__logout"
           onClick={manejarLogout}
-          title="Cerrar sesion"
-          aria-label="Cerrar sesion"
+          title="Cerrar sesión"
+          aria-label="Cerrar sesión"
         >
           <IcoLogout />
         </button>

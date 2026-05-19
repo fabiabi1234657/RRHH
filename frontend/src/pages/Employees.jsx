@@ -44,7 +44,7 @@ const deptColor = name => {
 };
 
 /* ----------------------------------------------------------
-   Formulario para crear / editar una posicion (cargo)
+   Formulario para crear / editar una posición (cargo)
    Modelo Position del backend:
      - title (string, required)
      - department (ObjectId ref Department, required)
@@ -64,7 +64,7 @@ function FormPosicion({ inicial, departamentos, guardando, error, onGuardar, onC
       {error && <Alert tipo="error" onCerrar={onCerrarError}>{error}</Alert>}
 
       <div className="field">
-        <label className="field__label" htmlFor="pf-titulo">Titulo del cargo *</label>
+        <label className="field__label" htmlFor="pf-titulo">Título del cargo *</label>
         <input id="pf-titulo" name="titulo" className="field__input"
           placeholder="Ej. Desarrollador Senior" value={form.titulo} onChange={cambiar} required />
       </div>
@@ -82,7 +82,7 @@ function FormPosicion({ inicial, departamentos, guardando, error, onGuardar, onC
 
       <div className="pos-form__footer">
         <Button type="submit" variante="primary" cargando={guardando} fullWidth>
-          {inicial?._id ? 'Guardar cambios' : 'Crear posicion'}
+          {inicial?._id ? 'Guardar cambios' : 'Crear posición'}
         </Button>
       </div>
     </form>
@@ -90,7 +90,7 @@ function FormPosicion({ inicial, departamentos, guardando, error, onGuardar, onC
 }
 
 /* ================================================================
-   Pagina principal: Posiciones / Cargos
+   Página principal: Posiciones / Cargos
    Endpoint: /api/cargos
    Modelo: { title, department }
    ================================================================ */
@@ -188,12 +188,12 @@ export default function Employees() {
     <div className="posiciones">
       <div className="page-header">
         <div className="page-header__left">
-          <h1 className="page-header__title">Catalogo de cargos</h1>
-          <p className="page-header__desc">Responsabilidades y areas vinculadas</p>
+          <h1 className="page-header__title">Catálogo de cargos</h1>
+          <p className="page-header__desc">Responsabilidades y áreas vinculadas</p>
         </div>
         <Button variante="primary" icono={<IcoPlus />}
           onClick={() => { setErrorAccion(null); setModalCrear(true); }}>
-          Nueva posicion
+          Nueva posición
         </Button>
       </div>
 
@@ -205,7 +205,7 @@ export default function Employees() {
         </div>
         {!cargando && (
           <span className="dept-count">
-            {filtradas.length} {filtradas.length === 1 ? 'posicion' : 'posiciones'}
+            {filtradas.length} {filtradas.length === 1 ? 'posición' : 'posiciones'}
           </span>
         )}
       </div>
@@ -236,7 +236,7 @@ export default function Employees() {
                 {busqueda ? 'Sin resultados' : 'No hay posiciones'}
               </p>
               <p className="empty-state__desc">
-                {busqueda ? `No se encontro "${busqueda}"` : 'Crea la primera posicion para comenzar.'}
+                {busqueda ? `No se encontró "${busqueda}"` : 'Crea la primera posición para comenzar.'}
               </p>
             </div>
           ) : (
@@ -290,7 +290,7 @@ export default function Employees() {
       )}
 
       {modalCrear && (
-        <Modal titulo="Nueva posicion" onClose={() => setModalCrear(false)}>
+        <Modal titulo="Nueva posición" onClose={() => setModalCrear(false)}>
           <FormPosicion
             departamentos={departamentos}
             guardando={guardando}
@@ -302,7 +302,7 @@ export default function Employees() {
       )}
 
       {editando && (
-        <Modal titulo="Editar posicion" onClose={() => setEditando(null)}>
+        <Modal titulo="Editar posición" onClose={() => setEditando(null)}>
           <FormPosicion
             inicial={inicialEdicion(editando)}
             departamentos={departamentos}

@@ -1,7 +1,7 @@
 /**
- * Login.jsx - Pagina de inicio de sesion de CorpHR.
+ * Login.jsx - Página de inicio de sesión de CorpHR.
  *
- * Diseno:
+ * Diseño:
  *  - Panel izquierdo: branding compacto (logo, tagline, pills decorativas)
  *  - Panel derecho: formulario limpio sin selector de rol
  *  - "Volver al inicio" fijo en esquina superior izquierda
@@ -13,7 +13,6 @@ import Button      from '../components/ui/Button';
 import Alert       from '../components/ui/Alert';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import { toast }   from '../stores/useToastStore';
-import './Login.css';
 
 /* -- Iconos -- */
 const IcoEye    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
@@ -62,7 +61,7 @@ export default function Login() {
 
       irPorRol(resultado.user);
     } catch (err) {
-      const msg = err.message || 'Error al iniciar sesion';
+      const msg = err.message || 'Error al iniciar sesión';
       toast.error('Error al iniciar sesión', msg);
       setError(msg);
     } finally {
@@ -200,13 +199,13 @@ export default function Login() {
               </div>
 
               <div className="field">
-                <label htmlFor="password" className="field__label">Contrasena</label>
+                <label htmlFor="password" className="field__label">Contraseña</label>
                 <div className="field__input-wrap">
                   <input
                     id="password"
                     type={verPass ? 'text' : 'password'}
                     className="field__input"
-                    placeholder="Ingresa tu contrasena"
+                    placeholder="Ingresa tu contraseña"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="current-password"
@@ -216,7 +215,7 @@ export default function Login() {
                     type="button"
                     className="field__eye"
                     onClick={() => setVerPass(v => !v)}
-                    aria-label={verPass ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                    aria-label={verPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   >
                     {verPass ? <IcoEyeOff /> : <IcoEye />}
                   </button>
@@ -230,7 +229,7 @@ export default function Login() {
                 fullWidth
                 cargando={cargando}
               >
-                {cargando ? 'Verificando...' : 'Iniciar Sesion'}
+                {cargando ? 'Verificando...' : 'Iniciar Sesión'}
               </Button>
             </form>
           )}
@@ -277,10 +276,10 @@ export default function Login() {
             </form>
           )}
 
-          {/* Recuperar contrasena */}
+          {/* Recuperar contraseña */}
           {!mfaToken && (
             <p className="login-card__footer">
-              Olvidaste tu contrasena?{' '}
+              ¿Olvidaste tu contraseña?{' '}
               <Link to="/recuperar-contrasena" className="field__link">Recuperar acceso</Link>
             </p>
           )}

@@ -152,7 +152,7 @@ function FormEmpleado({ inicial, departamentos, posiciones, guardando, error, on
 
       <div className="emp-form__row">
         <div className="field">
-          <label className="field__label" htmlFor="ef-trialEndDate">Fin de periodo de prueba</label>
+          <label className="field__label" htmlFor="ef-trialEndDate">Fin de período de prueba</label>
           <input
             id="ef-trialEndDate" name="trialEndDate" type="date" className="field__input"
             value={form.trialEndDate ?? ''} onChange={cambiar}
@@ -186,7 +186,7 @@ function FormEmpleado({ inicial, departamentos, posiciones, guardando, error, on
   );
 }
 
-/* -- Pagina principal -- */
+/* -- Página principal -- */
 export default function GestionEmpleados() {
   const [empleados, setEmpleados]         = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
@@ -231,9 +231,6 @@ export default function GestionEmpleados() {
     const dept   = typeof emp.department === 'object' ? emp.department?.name  : '';
     return nombre.toLowerCase().includes(q) || cargo.toLowerCase().includes(q) || dept.toLowerCase().includes(q);
   });
-
-  /* Resetear a página 1 cuando cambia la búsqueda */
-  useEffect(() => { setPagina(1); }, [busqueda]);
 
   const pagEmps = filtrados.slice((pagina - 1) * EMP_PAGE, pagina * EMP_PAGE);
 
@@ -353,7 +350,7 @@ export default function GestionEmpleados() {
             className="search-bar__input"
             placeholder="Buscar por nombre, cargo o departamento..."
             value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
+            onChange={e => { setBusqueda(e.target.value); setPagina(1); }}
           />
         </div>
         {!cargando && (

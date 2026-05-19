@@ -6,7 +6,7 @@ import Badge   from '../components/ui/Badge';
 import Alert   from '../components/ui/Alert';
 import { toast } from '../stores/useToastStore';
 
-/* -- Icono de lapiz (editar) -- */
+/* -- Icono de lápiz (editar) -- */
 const IcoEdit = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -23,7 +23,7 @@ const IcoDelete = () => (
   </svg>
 );
 
-/* -- Icono de busqueda -- */
+/* -- Icono de búsqueda -- */
 const IcoSearch = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -37,7 +37,7 @@ const IcoPlus = () => (
   </svg>
 );
 
-/* -- Formulario de creacion / edicion de departamento -- */
+/* -- Formulario de creación / edición de departamento -- */
 function FormDepartamento({ inicial, guardando, error, onGuardar, onCerrarError }) {
   /* Estado inicial del formulario */
   const [form, setForm] = useState({ nombre: '', descripcion: '', ...inicial });
@@ -62,11 +62,11 @@ function FormDepartamento({ inicial, guardando, error, onGuardar, onCerrarError 
           value={form.nombre} onChange={cambiar} required />
       </div>
 
-      {/* Campo: descripcion (opcional) */}
+      {/* Campo: descripción (opcional) */}
       <div className="field">
-        <label className="field__label" htmlFor="df-desc">Descripcion</label>
+        <label className="field__label" htmlFor="df-desc">Descripción</label>
         <textarea id="df-desc" name="descripcion" className="field__input field__textarea"
-          placeholder="Breve descripcion del departamento..." rows={3}
+          placeholder="Breve descripción del departamento..." rows={3}
           value={form.descripcion} onChange={cambiar} />
       </div>
 
@@ -95,10 +95,10 @@ export default function Departments() {
     deleteDepartment,
     clearDepartmentError
   } = useDepartmentStore();
-  /* Termino de busqueda */
+  /* Término de búsqueda */
   const [busqueda, setBusqueda] = useState('');
 
-  /* Modal de creacion */
+  /* Modal de creación */
   const [modalCrear, setModalCrear] = useState(false);
   /* Departamento seleccionado para editar (null = ninguno) */
   const [editando, setEditando] = useState(null);
@@ -121,7 +121,7 @@ export default function Departments() {
 
   useEffect(() => { cargar(); }, [cargar]);
 
-  /* -- Lista filtrada por busqueda -- */
+  /* -- Lista filtrada por búsqueda -- */
   const filtrados = departamentos.filter(d =>
     d.name?.toLowerCase().includes(busqueda.toLowerCase()) ||
     d.description?.toLowerCase().includes(busqueda.toLowerCase())
@@ -143,7 +143,7 @@ export default function Departments() {
     }
   };
 
-  /* -- Guardar edicion de departamento -- */
+  /* -- Guardar edición de departamento -- */
   const actualizarDepartamento = async ({ nombre, descripcion }) => {
     setGuardando(true);
     setErrorAccion(null);
@@ -187,7 +187,7 @@ export default function Departments() {
       {/* -- Encabezado de la pagina -- */}
       <div className="page-header">
         <div className="page-header__left">
-          <h1 className="page-header__title">Areas organizacionales</h1>
+          <h1 className="page-header__title">Áreas organizacionales</h1>
           <p className="page-header__desc">Estructura interna y descripcion de cada equipo</p>
         </div>
         <Button variante="primary" icono={<IcoPlus />} onClick={() => { setErrorAccion(null); setModalCrear(true); }}>
@@ -238,7 +238,7 @@ export default function Departments() {
                 {busqueda ? 'Sin resultados' : 'No hay departamentos'}
               </p>
               <p className="empty-state__desc">
-                {busqueda ? `No se encontro "${busqueda}"` : 'Crea el primer departamento para comenzar.'}
+                {busqueda ? `No se encontró "${busqueda}"` : 'Crea el primer departamento para comenzar.'}
               </p>
             </div>
           ) : (

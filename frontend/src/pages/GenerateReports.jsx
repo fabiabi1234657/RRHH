@@ -1,5 +1,5 @@
 /**
- * GenerateReports.jsx — Generacion de reportes PDF y Excel (CSV).
+ * GenerateReports.jsx — Generación de reportes PDF y Excel (CSV).
  */
 import { useState } from 'react';
 import jsPDF from 'jspdf';

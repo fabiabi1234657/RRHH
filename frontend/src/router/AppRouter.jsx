@@ -1,8 +1,8 @@
 /**
  * AppRouter.jsx — Enrutador principal de CorpHR.
  *
- * Define todas las rutas de la aplicacion con proteccion por rol:
- *   - Rutas publicas   : Login, Recuperar contrasena
+ * Define todas las rutas de la aplicación con protección por rol:
+ *   - Rutas públicas   : Login, Recuperar contraseña
  *   - Rutas admin      : Dashboard, Posiciones, Departamentos, Asistencia, Reportes
  *   - Rutas empleado   : Mi Perfil, Mi Asistencia
  *
@@ -10,7 +10,7 @@
  *   PrivateRoute  — requiere estar autenticado
  *   AdminRoute    — requiere rol 'admin'
  *   EmployeeRoute — requiere rol 'employee'
- *   PublicRoute   — redirige al dashboard si ya esta autenticado
+ *   PublicRoute   — redirige al dashboard si ya está autenticado
  */
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
@@ -19,12 +19,12 @@ import { useAuth } from '../hooks/useAuth';
 /* Componentes de layout */
 import Layout from '../components/layout/Layout';
 
-/* Paginas publicas */
+/* Páginas públicas */
 import Home            from '../pages/Home';
 import Login           from '../pages/Login';
 import RecoverPassword from '../pages/RecoverPassword';
 
-/* Paginas del administrador */
+/* Páginas del administrador */
 import Dashboard   from '../pages/Dashboard';
 import Employees         from '../pages/Employees';          /* Posiciones/Cargos → /api/cargos */
 import GestionEmpleados  from '../pages/GestionEmpleados';   /* Empleados         → /api/empleados */
@@ -34,7 +34,7 @@ import Reports     from '../pages/Reports';
 import Register    from '../pages/Register';       /* Registro de usuarios → /api/auth/register */
 import GenerateReports from '../pages/GenerateReports';
 
-/* Paginas del empleado */
+/* Páginas del empleado */
 import MyProfile    from '../pages/MyProfile';
 import MyAttendance from '../pages/MyAttendance';
 
