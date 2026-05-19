@@ -1,5 +1,5 @@
 /* ============================================================
-   RecoverPassword.jsx - Pagina de recuperacion de contrasena
+   RecoverPassword.jsx - Página de recuperación de contraseña
    ============================================================ */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -50,10 +50,10 @@ export default function RecoverPassword() {
       if (respuesta?.success) {
         setEnviado(true);
       } else {
-        throw new Error('No se pudo enviar la solicitud de recuperacion.');
+        throw new Error('No se pudo enviar la solicitud de recuperación.');
       }
     } catch (err) {
-      setError(err.message || 'Error al enviar instrucciones de recuperacion.');
+      setError(err.message || 'Error al enviar instrucciones de recuperación.');
     } finally {
       setEnviando(false);
     }
@@ -72,12 +72,12 @@ export default function RecoverPassword() {
           <p className="recover-brand__eyebrow">Acceso seguro</p>
           <h1 className="recover-brand__title">Recupera el acceso<br />a tu cuenta.</h1>
           <p className="recover-brand__sub">
-            Te enviaremos instrucciones para restablecer tu contrasena de forma segura.
+            Te enviaremos instrucciones para restablecer tu contraseña de forma segura.
           </p>
           <ul className="recover-brand__tips">
-            <li><IcoCheck /> Enlace con expiracion de 24 h</li>
+            <li><IcoCheck /> Enlace con expiración de 24 h</li>
             <li><IcoShield /> Proceso completamente cifrado</li>
-            <li><IcoCheck /> Sin exponer tu contrasena actual</li>
+            <li><IcoCheck /> Sin exponer tu contraseña actual</li>
           </ul>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function RecoverPassword() {
 
         {/* Esquina superior izquierda — igual que Login */}
         <Link to="/login" className="recover-back">
-          <IcoArrowLeft /> Volver al inicio de sesion
+          <IcoArrowLeft /> Volver al inicio de sesión
         </Link>
 
         {/* Esquina superior derecha — igual que Login */}
@@ -100,9 +100,9 @@ export default function RecoverPassword() {
             <IcoMail />
           </div>
 
-          <h2 className="recover-title">Olvide mi contrasena</h2>
+          <h2 className="recover-title">Olvidé mi contraseña</h2>
           <p className="recover-desc">
-            Ingresa tu correo electronico y te enviaremos un enlace para restablecer tu contrasena.
+            Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
           </p>
 
           {enviado ? (
@@ -110,11 +110,11 @@ export default function RecoverPassword() {
               <div className="recover-success__icon"><IcoCheck /></div>
               <h3 className="recover-success__title">Correo enviado</h3>
               <p className="recover-success__desc">
-                Si <strong>{email}</strong> esta registrado, recibiras las instrucciones en breve.
+                Si <strong>{email}</strong> está registrado, recibirás las instrucciones en breve.
                 Revisa tu carpeta de spam si no encuentras el correo.
               </p>
               <Link to="/login" className="recover-login-link">
-                <IcoArrowLeft /> Regresar al inicio de sesion
+                <IcoArrowLeft /> Regresar al inicio de sesión
               </Link>
             </div>
           ) : (
@@ -126,7 +126,7 @@ export default function RecoverPassword() {
               )}
               <form className="recover-form" onSubmit={handleSubmit}>
                 <div className="field">
-                  <label className="field__label" htmlFor="rec-email">Correo electronico</label>
+                  <label className="field__label" htmlFor="rec-email">Correo electrónico</label>
                   <input
                     id="rec-email"
                     type="email"
@@ -143,8 +143,8 @@ export default function RecoverPassword() {
                 </Button>
               </form>
               <p className="recover-footer-note">
-                Recuerdas tu contrasena?{' '}
-                <Link to="/login">Inicia sesion</Link>
+                ¿Recuerdas tu contraseña?{' '}
+                <Link to="/login">Inicia sesión</Link>
               </p>
             </>
           )}

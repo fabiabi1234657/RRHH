@@ -45,20 +45,22 @@ export default function EmployeeDocumentsModal({ employeeId, employeeName, onClo
   const [expiresAt, setExpiresAt] = useState('');
   const [subiendo, setSubiendo] = useState(false);
 
-  const cargar = useCallback(async () => {
-    setCargando(true);
-    setError('');
-    try {
-      const data = await listarDocumentosEmpleadoAPI(employeeId);
-      setDocs(data.documents || []);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setCargando(false);
-    }
-  }, [employeeId]);
+  const [reloadKey, setReloadKey] = useState(0);
+  const cargar = useCallback(() => setReloadKey((k) => k + 1), []);
 
-  useEffect(() => { void cargar(); }, [cargar]);
+  useEffect(() => {
+    let active = true;
+    const fetchDocs = () => {
+      setCargando(true);
+      setError('');
+      listarDocumentosEmpleadoAPI(employeeId)
+        .then((data) => { if (active) setDocs(data.documents || []); })
+        .catch((e) => { if (active) setError(e.message); })
+        .finally(() => { if (active) setCargando(false); });
+    };
+    fetchDocs();
+    return () => { active = false; };
+  }, [employeeId, reloadKey]);
 
   const subir = async (e) => {
     e.preventDefault();

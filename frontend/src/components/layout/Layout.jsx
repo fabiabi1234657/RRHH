@@ -1,8 +1,8 @@
 /**
- * Layout.jsx ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Shell principal de la aplicacion autenticada.
+ * Layout.jsx - Shell principal de la aplicación autenticada.
  *
- * Compone el Sidebar fijo, la Topbar fija y el area de contenido
- * donde React Router renderiza la pagina activa via <Outlet />.
+ * Compone el Sidebar fijo, la Topbar fija y el área de contenido
+ * donde React Router renderiza la página activa vía <Outlet />.
  */
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    /* Contenedor raiz del shell de la aplicacion */
+    /* Contenedor raíz del shell de la aplicación */
     <div className="layout">
 
       <div
@@ -22,16 +22,16 @@ export default function Layout() {
         aria-hidden={!sidebarOpen}
       />
 
-      {/* Barra lateral fija con la navegacion */}
+      {/* Barra lateral fija con la navegación */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Columna principal: topbar + contenido de la pagina */}
+      {/* Columna principal: topbar + contenido de la página */}
       <div className="layout__main">
 
-        {/* Barra superior fija con el titulo y controles */}
+        {/* Barra superior fija con el título y controles */}
         <Topbar onMenuClick={() => setSidebarOpen((prev) => !prev)} />
 
-        {/* Area de contenido desplazable ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â aqui se renderiza cada pagina */}
+        {/* Área de contenido desplazable — aquí se renderiza cada página */}
         <main className="layout__content fade-in">
           <Outlet />
         </main>

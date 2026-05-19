@@ -3,6 +3,7 @@ import { obtenerReporteAsistenciaMensualAPI, obtenerReporteHeadcountAPI, obtener
 import Alert from '../components/ui/Alert';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import Pagination from '../components/ui/Pagination';
 import {
   BarChart, Bar, AreaChart, Area,
   PieChart, Pie, Cell,
@@ -11,6 +12,7 @@ import {
 } from 'recharts';
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const PG_SIZE = 10;
 const IcoRefresh = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>;
 
 function ReportMetric({ label, value, hint, tone }) {
@@ -27,10 +29,12 @@ export default function Reports() {
   const [trend, setTrend] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [pagina, setPagina] = useState(1);
 
   const cargar = useCallback(async () => {
     setCargando(true);
     setError('');
+    setPagina(1);
     try {
       const [monthlyResp, headcountResp] = await Promise.all([
         obtenerReporteAsistenciaMensualAPI({ month, year }),
@@ -63,6 +67,11 @@ export default function Reports() {
     totalDays: acc.totalDays + item.totalDays,
   }), { present: 0, late: 0, absent: 0, justified: 0, totalDays: 0 }), [monthly]);
 
+  const paginaData = useMemo(
+    () => monthly.slice((pagina - 1) * PG_SIZE, pagina * PG_SIZE),
+    [monthly, pagina],
+  );
+
   const distData = useMemo(() => [
     { name: 'Presente',    value: totales.present,   color: '#10B981' },
     { name: 'Tarde',       value: totales.late,      color: '#F59E0B' },
@@ -79,7 +88,7 @@ export default function Reports() {
     <div className="reports-page">
       <div className="page-header page-header--panel">
         <div className="page-header__left">
-          <h1 className="page-header__title">Indicadores del periodo</h1>
+          <h1 className="page-header__title">Indicadores del período</h1>
           <p className="page-header__desc">Seguimiento de personas y asistencia.</p>
         </div>
         <div className="reports-controls">
@@ -102,7 +111,7 @@ export default function Reports() {
         <section className="card">
           <div className="card__header"><div className="card__header-left"><h3 className="card__title">Asistencia mensual</h3><span className="card__count">{monthly.length} empleados incluidos</span></div><Badge texto={`${MESES[month - 1]} ${year}`} tipo="blue" /></div>
           {cargando ? <div className="dept-skeleton">{[1, 2, 3, 4].map((item) => <div key={item} className="dept-skeleton__row"><div className="skeleton" style={{ width: '70%', height: 14 }} /></div>)}</div> : (
-            <div className="table-wrap"><table className="table"><thead><tr><th>Empleado</th><th>Area</th><th>Presente</th><th>Tarde</th><th>Ausente</th></tr></thead><tbody>{monthly.map((item) => <tr key={item.employeeId}><td><span className="table__primary">{item.name}</span><span className="table__secondary">{item.email}</span></td><td><span className="table__primary">{item.department}</span><span className="table__secondary">{item.position}</span></td><td><Badge texto={String(item.present)} tipo="green" /></td><td><Badge texto={String(item.late)} tipo="orange" /></td><td><Badge texto={String(item.absent)} tipo="red" /></td></tr>)}</tbody></table></div>
+            <><div className="table-wrap"><table className="table"><thead><tr><th>Empleado</th><th>Área</th><th>Presente</th><th>Tarde</th><th>Ausente</th></tr></thead><tbody>{paginaData.map((item) => <tr key={item.employeeId}><td><span className="table__primary">{item.name}</span><span className="table__secondary">{item.email}</span></td><td><span className="table__primary">{item.department}</span><span className="table__secondary">{item.position}</span></td><td><Badge texto={String(item.present)} tipo="green" /></td><td><Badge texto={String(item.late)} tipo="orange" /></td><td><Badge texto={String(item.absent)} tipo="red" /></td></tr>)}</tbody></table></div><Pagination page={pagina} total={monthly.length} pageSize={PG_SIZE} onChange={setPagina} /></>
           )}
         </section>
 
@@ -145,7 +154,7 @@ export default function Reports() {
           <div className="card chart-card">
             <div className="card__header">
               <div className="card__header-left">
-                <h3 className="card__title">Distribución del periodo</h3>
+                <h3 className="card__title">Distribución del período</h3>
                 <span className="card__count">{MESES[month - 1]} {year}</span>
               </div>
             </div>

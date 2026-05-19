@@ -41,7 +41,7 @@ const IcoCalendar = () => (
   </svg>
 );
 
-/* -- Fila de informacion del perfil -- */
+/* -- Fila de información del perfil -- */
 function FilaPerfil({ icono, etiqueta, valor }) {
   return (
     <div className="perfil__fila">
@@ -55,9 +55,9 @@ function FilaPerfil({ icono, etiqueta, valor }) {
 }
 
 /* ================================================================
-   Pagina: Mi Perfil
+   Página: Mi Perfil
   Llama a GET /api/auth/profile para mostrar datos del usuario
-  autenticado y permite editar nombre y contrasena desde un modal.
+  autenticado y permite editar nombre y contraseña desde un modal.
    ================================================================ */
 export default function MyProfile() {
   const { refrescarPerfil } = useAuth();
@@ -225,7 +225,7 @@ export default function MyProfile() {
             {/* Divider */}
             <div className="perfil__divider" />
 
-            {/* Filas de informacion */}
+            {/* Filas de información */}
             <div className="perfil__info">
               <FilaPerfil
                 icono={<IcoUser />}
@@ -234,7 +234,7 @@ export default function MyProfile() {
               />
               <FilaPerfil
                 icono={<IcoMail />}
-                etiqueta="Correo electronico"
+                etiqueta="Correo electrónico"
                 valor={usuario.email}
               />
               <FilaPerfil

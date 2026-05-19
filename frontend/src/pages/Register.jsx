@@ -41,13 +41,13 @@ export default function Register() {
     setError('');
     setExito('');
 
-    /* Validacion local de contrasenas coincidentes */
+    /* Validación local de contraseñas coincidentes */
     if (form.password !== form.confirmar) {
-      setError('Las contrasenas no coinciden. Verificalas e intenta de nuevo.');
+      setError('Las contraseñas no coinciden. Verifícalas e intenta de nuevo.');
       return;
     }
     if (form.password.length < 6) {
-      setError('La contrasena debe tener al menos 6 caracteres.');
+      setError('La contraseña debe tener al menos 6 caracteres.');
       return;
     }
 
@@ -85,7 +85,7 @@ export default function Register() {
             <div className="registro__head-icon"><IcoUserPlus /></div>
             <div>
               <h2>Datos de la cuenta</h2>
-              <p>Completa la informacion basica para habilitar el acceso.</p>
+              <p>Completa la información básica para habilitar el acceso.</p>
             </div>
           </div>
 
@@ -104,16 +104,16 @@ export default function Register() {
 
           {/* Email */}
           <div className="field">
-            <label className="field__label" htmlFor="rg-email">Correo electronico *</label>
+            <label className="field__label" htmlFor="rg-email">Correo electrónico *</label>
             <input id="rg-email" name="email" type="email" className="field__input"
               placeholder="usuario@empresa.com" value={form.email}
               onChange={cambiar} required />
           </div>
 
-          {/* Fila: contrasena + confirmacion */}
+          {/* Fila: contraseña + confirmación */}
           <div className="registro__row">
             <div className="field">
-              <label className="field__label" htmlFor="rg-pass">Contrasena *</label>
+              <label className="field__label" htmlFor="rg-pass">Contraseña *</label>
               <div className="field__input-wrap">
                 <input id="rg-pass" name="password"
                   type={verPass ? 'text' : 'password'}
@@ -127,12 +127,12 @@ export default function Register() {
             </div>
 
             <div className="field">
-              <label className="field__label" htmlFor="rg-confirm">Confirmar contrasena *</label>
+              <label className="field__label" htmlFor="rg-confirm">Confirmar contraseña *</label>
               <div className="field__input-wrap">
                 <input id="rg-confirm" name="confirmar"
                   type={verPass ? 'text' : 'password'}
                   className="field__input"
-                  placeholder="Repite la contrasena"
+                  placeholder="Repite la contraseña"
                   value={form.confirmar} onChange={cambiar} required />
               </div>
             </div>

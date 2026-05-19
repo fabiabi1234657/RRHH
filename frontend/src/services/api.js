@@ -19,14 +19,14 @@ import api from '../api/axios';
 const MENSAJES_HTTP = {
   400: 'Datos incorrectos. Revisa los campos e intenta de nuevo.',
   401: 'Credenciales incorrectas. Verifica tu correo y contraseña.',
-  403: 'No tienes permiso para realizar esta accion.',
+  403: 'No tienes permiso para realizar esta acción.',
   404: 'El recurso solicitado no fue encontrado.',
   409: 'Ya existe un registro con esos datos.',
-  422: 'Los datos ingresados no son validos.',
+  422: 'Los datos ingresados no son válidos.',
   429: 'Demasiados intentos. Espera un momento antes de continuar.',
-  500: 'Error interno del servidor. Intenta mas tarde.',
-  502: 'No se puede conectar al servidor. Verifica que el servicio este activo.',
-  503: 'Servicio no disponible. Intenta mas tarde.',
+  500: 'Error interno del servidor. Intenta más tarde.',
+  502: 'No se puede conectar al servidor. Verifica que el servicio esté activo.',
+  503: 'Servicio no disponible. Intenta más tarde.',
 };
 
 function extraerMensaje(error) {
@@ -35,7 +35,7 @@ function extraerMensaje(error) {
     return data?.message || MENSAJES_HTTP[status] || `Error del servidor (${status}).`;
   }
   if (error.request) {
-    return 'No se puede conectar al servidor. Verifica que el servicio este activo.';
+    return 'No se puede conectar al servidor. Verifica que el servicio esté activo.';
   }
   return error.message || 'Error desconocido.';
 }

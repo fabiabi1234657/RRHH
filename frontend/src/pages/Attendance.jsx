@@ -71,9 +71,6 @@ export default function Attendance() {
     registro: asistenciasPorEmpleado.get(empleado._id),
   })), [empleados, asistenciasPorEmpleado]);
 
-  /* Resetear página cuando cambia la fecha */
-  useEffect(() => { setPagina(1); }, [fecha]);
-
   const pagFilas = filas.slice((pagina - 1) * ATT_PAGE, pagina * ATT_PAGE);
 
   const resumen = useMemo(() => {
@@ -101,7 +98,7 @@ export default function Attendance() {
           <p className="page-header__desc">Seguimiento diario del personal activo.</p>
         </div>
         <div className="attendance-actions">
-          <input className="field__input attendance-actions__date" type="date" value={fecha} onChange={(event) => setFecha(event.target.value)} />
+          <input className="field__input attendance-actions__date" type="date" value={fecha} onChange={(event) => { setFecha(event.target.value); setPagina(1); }} />
           <Button variante="secondary" icono={<IcoRefresh />} onClick={cargar} cargando={cargando}>Actualizar</Button>
         </div>
       </div>
