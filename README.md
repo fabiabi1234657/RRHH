@@ -172,6 +172,46 @@ Swagger UI lista todos los endpoints con sus parámetros, cuerpos y respuestas.
 
 ---
 
+## Rendimiento y calidad (Lighthouse)
+
+Auditoría realizada con **Google Lighthouse 13** en modo Desktop (`http://localhost`). Se midieron las 10 páginas de la aplicación en cuatro categorías.
+
+### Scores antes → después de las optimizaciones
+
+| Página | Performance | Accessibility | Best Practices | SEO |
+|--------|:-----------:|:-------------:|:--------------:|:---:|
+| Landing (`/`) | 65 → **98** | 88 → **100** | 96 → **96** | 82 → **92** |
+| Login (`/login`) | 65 → **98** | 88 → **100** | 96 → **96** | 82 → **92** |
+| Recuperar contraseña | 65 → **98** | 95 → **98** | 96 → **96** | 82 → **92** |
+| Dashboard (`/app/dashboard`) | 65 → **98** | 85 → **92** | 96 → **96** | 82 → **92** |
+| Gestión empleados | 65 → **98** | 85 → **92** | 96 → **96** | 82 → **92** |
+| Departamentos / Posiciones | 65 → **98** | 88 → **92** | 96 → **96** | 82 → **92** |
+| Asistencia | 65 → **98** | 82 → **92** | 96 → **96** | 82 → **92** |
+| Reportes | 65 → **98** | 80 → **90** | 96 → **96** | 82 → **92** |
+| Generar reportes | 65 → **95** | 88 → **92** | 96 → **96** | 82 → **92** |
+| Registro (`/app/registro`) | 65 → **98** | 85 → **95** | 96 → **96** | 82 → **92** |
+
+### Problemas corregidos
+
+**Performance — render blocking y bundle size**
+- Google Fonts convertido de `rel="stylesheet"` bloqueante a `rel="preload"` + `onload` swap en `index.html`
+- `@import` de Google Fonts eliminado de `globals.css` (bloqueaba el renderizado)
+- Code splitting implementado con `React.lazy` + `Suspense` en `AppRouter.jsx`: bundle inicial reducido de **763 KB → 318 KB**; cada página se descarga solo al navegar a ella
+
+**SEO**
+- `<meta name="description">` añadido globalmente en `index.html`
+- `<meta name="robots" content="index, follow">` añadido en `index.html`
+- `frontend/public/robots.txt` creado: solo protege `/app/` (rutas autenticadas); páginas públicas (`/`, `/login`, `/register`, `/recuperar-contrasena`) permitidas para indexación
+
+**Accesibilidad**
+- `landmark-one-main`: `<main>` añadido en `Login.jsx` y `Home.jsx`
+- `button-name`: `aria-label` dinámico en botón mostrar/ocultar contraseña (`Register.jsx`)
+- `label` / `select-name`: labels visualmente ocultos (`.sr-only`) para inputs de fecha en `Attendance.jsx` y select/año en `Reports.jsx`
+- `heading-order`: jerarquía h1 → h2 corregida en tarjetas de `Attendance.jsx` y `Reports.jsx`
+- `.sr-only` añadido como clase utilitaria en `globals.css`
+
+---
+
 ## Más información
 
 - [backend/README.md](backend/README.md) — Modelos, endpoints y pruebas

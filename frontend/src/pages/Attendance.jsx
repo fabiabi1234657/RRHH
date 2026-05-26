@@ -98,7 +98,8 @@ export default function Attendance() {
           <p className="page-header__desc">Seguimiento diario del personal activo.</p>
         </div>
         <div className="attendance-actions">
-          <input className="field__input attendance-actions__date" type="date" value={fecha} onChange={(event) => { setFecha(event.target.value); setPagina(1); }} />
+          <label htmlFor="attendance-date" className="sr-only">Fecha</label>
+          <input id="attendance-date" className="field__input attendance-actions__date" type="date" value={fecha} onChange={(event) => { setFecha(event.target.value); setPagina(1); }} />
           <Button variante="secondary" icono={<IcoRefresh />} onClick={cargar} cargando={cargando}>Actualizar</Button>
         </div>
       </div>
@@ -118,7 +119,7 @@ export default function Attendance() {
           <div className="card chart-card">
             <div className="card__header">
               <div className="card__header-left">
-                <h3 className="card__title">Distribución del día</h3>
+                <h2 className="card__title">Distribución del día</h2>
                 <span className="card__count">
                   {new Date(`${fecha}T00:00:00`).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
@@ -146,7 +147,7 @@ export default function Attendance() {
       <section className="card attendance-card">
         <div className="card__header">
           <div className="card__header-left">
-            <h3 className="card__title">Registro del dia</h3>
+            <h2 className="card__title">Registro del dia</h2>
             <span className="card__count">{filas.length} empleados evaluados</span>
           </div>
           <span className="attendance-date-label">

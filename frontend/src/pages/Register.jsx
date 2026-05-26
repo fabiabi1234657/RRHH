@@ -120,7 +120,7 @@ export default function Register() {
                   className="field__input"
                   placeholder="Min. 6 caracteres"
                   value={form.password} onChange={cambiar} required />
-                <button type="button" className="field__eye" onClick={() => setVerPass(v => !v)} tabIndex={-1}>
+                <button type="button" className="field__eye" onClick={() => setVerPass(v => !v)} tabIndex={-1} aria-label={verPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
                   {verPass ? <IcoEyeOff /> : <IcoEye />}
                 </button>
               </div>
