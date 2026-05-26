@@ -158,7 +158,7 @@ export default function Login() {
       </div>
 
       {/* -- Panel derecho: formulario -- */}
-      <div className="login-panel">
+      <main className="login-panel">
         <div className="login-card">
 
           {/* Titulo */}
@@ -284,7 +284,7 @@ export default function Login() {
             </p>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

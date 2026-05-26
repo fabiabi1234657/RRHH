@@ -234,3 +234,47 @@ El sistema de diseño está definido completamente en `src/styles/globals.css` u
 
 - Soporte completo de tema oscuro/claro mediante la clase `.dark` en `<body>`.
 - Clases de componente: `.card`, `.table`, `.field__*`, `.btn`, `.badge`, `.pagination`, `.toast`, `.emp-chip`, etc.
+- `.sr-only` — clase utilitaria para contenido visualmente oculto pero accesible por lectores de pantalla.
+
+---
+
+## Optimizaciones Lighthouse
+
+Auditoría realizada con **Lighthouse 13** en modo Desktop. Los ajustes siguientes elevaron los scores de las 10 páginas auditadas.
+
+### Performance
+
+| Problema | Solución | Archivo |
+|----------|----------|---------|
+| Google Fonts bloqueaba el render (~160 ms) | `rel="preload"` + `onload` swap; eliminado `@import` en CSS | `index.html`, `globals.css` |
+| Bundle JS único de **763 KB** | Code splitting con `React.lazy` + `Suspense` → bundle inicial **318 KB**; páginas cargadas bajo demanda | `router/AppRouter.jsx` |
+
+Chunks generados (carga diferida):
+
+| Chunk | Tamaño |
+|-------|--------|
+| `GenerateReports` | 438 KB |
+| `PieChart` (Recharts) | 325 KB |
+| `Reports` | 27 KB |
+| `GestionEmpleados` | 19 KB |
+| `Dashboard` | 13 KB |
+| `MyProfile` | 11 KB |
+| `Employees` / `Departments` | 8–9 KB |
+| `Attendance` / `Register` / `MyAttendance` | 6 KB c/u |
+
+### SEO
+
+| Problema | Solución | Archivo |
+|----------|----------|---------|
+| Sin `meta description` | `<meta name="description">` añadido | `index.html` |
+| Sin directiva de rastreo | `<meta name="robots" content="index, follow">` | `index.html` |
+| `robots.txt` inválido / bloqueando páginas públicas | Creado `robots.txt`; solo `Disallow: /app/` | `public/robots.txt` |
+
+### Accesibilidad
+
+| Audit Lighthouse | Solución | Archivo |
+|-----------------|----------|---------|
+| `landmark-one-main` | Envuelto contenido principal en `<main>` | `Login.jsx`, `Home.jsx` |
+| `button-name` | `aria-label` dinámico en botón mostrar/ocultar contraseña | `Register.jsx` |
+| `label` / `select-name` | Labels `.sr-only` asociados a inputs de fecha y select de mes/año | `Attendance.jsx`, `Reports.jsx` |
+| `heading-order` (h1 → h3 saltando h2) | Tarjetas de gráfica cambiadas de `<h3>` a `<h2>` | `Attendance.jsx`, `Reports.jsx` |

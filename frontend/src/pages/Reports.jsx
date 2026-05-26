@@ -92,8 +92,10 @@ export default function Reports() {
           <p className="page-header__desc">Seguimiento de personas y asistencia.</p>
         </div>
         <div className="reports-controls">
-          <select className="field__input field__select" value={month} onChange={(e) => setMonth(Number(e.target.value))}>{MESES.map((mes, index) => <option key={mes} value={index + 1}>{mes}</option>)}</select>
-          <input className="field__input reports-controls__year" type="number" min="2020" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+          <label htmlFor="reports-month" className="sr-only">Mes</label>
+          <select id="reports-month" className="field__input field__select" value={month} onChange={(e) => setMonth(Number(e.target.value))}>{MESES.map((mes, index) => <option key={mes} value={index + 1}>{mes}</option>)}</select>
+          <label htmlFor="reports-year" className="sr-only">Año</label>
+          <input id="reports-year" className="field__input reports-controls__year" type="number" min="2020" value={year} onChange={(e) => setYear(Number(e.target.value))} />
           <Button variante="secondary" icono={<IcoRefresh />} onClick={cargar} cargando={cargando}>Actualizar</Button>
         </div>
       </div>
@@ -109,14 +111,14 @@ export default function Reports() {
 
       <div className="reports-layout">
         <section className="card">
-          <div className="card__header"><div className="card__header-left"><h3 className="card__title">Asistencia mensual</h3><span className="card__count">{monthly.length} empleados incluidos</span></div><Badge texto={`${MESES[month - 1]} ${year}`} tipo="blue" /></div>
+          <div className="card__header"><div className="card__header-left"><h2 className="card__title">Asistencia mensual</h2><span className="card__count">{monthly.length} empleados incluidos</span></div><Badge texto={`${MESES[month - 1]} ${year}`} tipo="blue" /></div>
           {cargando ? <div className="dept-skeleton">{[1, 2, 3, 4].map((item) => <div key={item} className="dept-skeleton__row"><div className="skeleton" style={{ width: '70%', height: 14 }} /></div>)}</div> : (
             <><div className="table-wrap"><table className="table"><thead><tr><th>Empleado</th><th>Área</th><th>Presente</th><th>Tarde</th><th>Ausente</th></tr></thead><tbody>{paginaData.map((item) => <tr key={item.employeeId}><td><span className="table__primary">{item.name}</span><span className="table__secondary">{item.email}</span></td><td><span className="table__primary">{item.department}</span><span className="table__secondary">{item.position}</span></td><td><Badge texto={String(item.present)} tipo="green" /></td><td><Badge texto={String(item.late)} tipo="orange" /></td><td><Badge texto={String(item.absent)} tipo="red" /></td></tr>)}</tbody></table></div><Pagination page={pagina} total={monthly.length} pageSize={PG_SIZE} onChange={setPagina} /></>
           )}
         </section>
 
         <section className="card">
-          <div className="card__header"><div className="card__header-left"><h3 className="card__title">Distribución por departamento</h3><span className="card__count">{headcount.length} áreas con personal activo</span></div></div>
+          <div className="card__header"><div className="card__header-left"><h2 className="card__title">Distribución por departamento</h2><span className="card__count">{headcount.length} áreas con personal activo</span></div></div>
           <div className="headcount-list">{headcount.map((item) => <div key={item.departmentId} className="headcount-item"><div className="headcount-item__row"><span className="headcount-item__name">{item.departmentName}</span><strong>{item.headcount}</strong></div><div className="headcount-item__track"><span style={{ width: `${(item.headcount / maxHeadcount) * 100}%` }} /></div></div>)}</div>
         </section>
       </div>
@@ -129,7 +131,7 @@ export default function Reports() {
           <div className="card chart-card">
             <div className="card__header">
               <div className="card__header-left">
-                <h3 className="card__title">Tendencia mensual</h3>
+                <h2 className="card__title">Tendencia mensual</h2>
                 <span className="card__count">últimos {trend.length} meses</span>
               </div>
             </div>
@@ -154,7 +156,7 @@ export default function Reports() {
           <div className="card chart-card">
             <div className="card__header">
               <div className="card__header-left">
-                <h3 className="card__title">Distribución del período</h3>
+                <h2 className="card__title">Distribución del período</h2>
                 <span className="card__count">{MESES[month - 1]} {year}</span>
               </div>
             </div>
@@ -182,7 +184,7 @@ export default function Reports() {
           <div className="card chart-card">
             <div className="card__header">
               <div className="card__header-left">
-                <h3 className="card__title">Headcount por departamento</h3>
+                <h2 className="card__title">Headcount por departamento</h2>
                 <span className="card__count">{headcount.length} áreas con personal</span>
               </div>
             </div>
@@ -206,7 +208,7 @@ export default function Reports() {
           <div className="card chart-card">
             <div className="card__header">
               <div className="card__header-left">
-                <h3 className="card__title">Tasa de cumplimiento</h3>
+                <h2 className="card__title">Tasa de cumplimiento</h2>
                 <span className="card__count">presentes + justificados / total</span>
               </div>
             </div>

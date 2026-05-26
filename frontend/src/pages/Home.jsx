@@ -164,8 +164,8 @@ export default function Home() {
         <Link to="/login" className="home-nav__link">Iniciar sesión</Link>
       </nav>
 
-      <section className="home-hero">
-        <HeroVisual />
+      <main>
+      <section className="home-hero">        <HeroVisual />
         <div className="home-hero__content">
           <p className="home-hero__eyebrow">Sistema de gestión de recursos humanos</p>
           <h1 className="home-hero__title">CorpHR</h1>
@@ -232,6 +232,8 @@ export default function Home() {
           </article>
         </div>
       </section>
+
+      </main>
 
       <footer className="home-footer">
         <div className="home-footer__brand">

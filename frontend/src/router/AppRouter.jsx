@@ -12,31 +12,40 @@
  *   EmployeeRoute — requiere rol 'employee'
  *   PublicRoute   — redirige al dashboard si ya está autenticado
  */
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import Spinner from '../components/ui/Spinner';
 
 /* Componentes de layout */
 import Layout from '../components/layout/Layout';
 
-/* Páginas públicas */
+/* Páginas públicas — carga eager (críticas para el primer render) */
 import Home            from '../pages/Home';
 import Login           from '../pages/Login';
 import RecoverPassword from '../pages/RecoverPassword';
 
-/* Páginas del administrador */
-import Dashboard   from '../pages/Dashboard';
-import Employees         from '../pages/Employees';          /* Posiciones/Cargos → /api/cargos */
-import GestionEmpleados  from '../pages/GestionEmpleados';   /* Empleados         → /api/empleados */
-import Departments       from '../pages/Departments';        /* Departamentos     → /api/departamentos */
-import Attendance  from '../pages/Attendance';
-import Reports     from '../pages/Reports';
-import Register    from '../pages/Register';       /* Registro de usuarios → /api/auth/register */
-import GenerateReports from '../pages/GenerateReports';
+/* Páginas del administrador — lazy loaded (solo se descargan al navegar) */
+const Dashboard      = lazy(() => import('../pages/Dashboard'));
+const Employees      = lazy(() => import('../pages/Employees'));
+const GestionEmpleados = lazy(() => import('../pages/GestionEmpleados'));
+const Departments    = lazy(() => import('../pages/Departments'));
+const Attendance     = lazy(() => import('../pages/Attendance'));
+const Reports        = lazy(() => import('../pages/Reports'));
+const Register       = lazy(() => import('../pages/Register'));
+const GenerateReports = lazy(() => import('../pages/GenerateReports'));
 
-/* Páginas del empleado */
-import MyProfile    from '../pages/MyProfile';
-import MyAttendance from '../pages/MyAttendance';
+/* Páginas del empleado — lazy loaded */
+const MyProfile    = lazy(() => import('../pages/MyProfile'));
+const MyAttendance = lazy(() => import('../pages/MyAttendance'));
+
+function PageLoader() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+      <Spinner />
+    </div>
+  );
+}
 
 /* ── Guardias de ruta ── */
 
@@ -90,7 +99,7 @@ export default function AppRouter() {
           <PublicRoute><RecoverPassword /></PublicRoute>
         } />
         <Route path="/register" element={
-          <PublicRoute><Register /></PublicRoute>
+          <PublicRoute><Suspense fallback={<PageLoader />}><Register /></Suspense></PublicRoute>
         } />
 
         {/* ── Rutas protegidas (con layout sidebar + topbar) ── */}
@@ -103,36 +112,36 @@ export default function AppRouter() {
 
           {/* Rutas exclusivas del administrador */}
           <Route path="dashboard" element={
-            <AdminRoute><Dashboard /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><Dashboard /></Suspense></AdminRoute>
           } />
           <Route path="posiciones" element={
-            <AdminRoute><Employees /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><Employees /></Suspense></AdminRoute>
           } />
           <Route path="departamentos" element={
-            <AdminRoute><Departments /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><Departments /></Suspense></AdminRoute>
           } />
           <Route path="asistencia" element={
-            <AdminRoute><Attendance /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><Attendance /></Suspense></AdminRoute>
           } />
           <Route path="reportes" element={
-            <AdminRoute><Reports /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><Reports /></Suspense></AdminRoute>
           } />
           <Route path="generar-reportes" element={
-            <AdminRoute><GenerateReports /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><GenerateReports /></Suspense></AdminRoute>
           } />
           <Route path="registro" element={
-            <AdminRoute><Register /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><Register /></Suspense></AdminRoute>
           } />
           <Route path="empleados" element={
-            <AdminRoute><GestionEmpleados /></AdminRoute>
+            <AdminRoute><Suspense fallback={<PageLoader />}><GestionEmpleados /></Suspense></AdminRoute>
           } />
 
           {/* Rutas del empleado (cualquier usuario autenticado) */}
           <Route path="mi-perfil" element={
-            <EmployeeRoute><MyProfile /></EmployeeRoute>
+            <EmployeeRoute><Suspense fallback={<PageLoader />}><MyProfile /></Suspense></EmployeeRoute>
           } />
           <Route path="mi-asistencia" element={
-            <EmployeeRoute><MyAttendance /></EmployeeRoute>
+            <EmployeeRoute><Suspense fallback={<PageLoader />}><MyAttendance /></Suspense></EmployeeRoute>
           } />
         </Route>
 
