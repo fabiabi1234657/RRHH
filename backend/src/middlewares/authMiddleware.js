@@ -36,7 +36,7 @@ export const protect = async (req, res, next) => {
 
     // Permitir que continue a la siguiente función
     next();
-  } catch (error) {
+  } catch (_error) {
     // El token no es válido, expiró, o algo salió mal
     res.status(401).json({
       success: false,

@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import { buildMfaPendingResponse } from './mfaController.js';
+import { authCookieOptions, clearAuthCookieOptions } from '../config/cookies.js';
 
 // Función para generar JWT
 const generateToken = (id) => {
@@ -154,12 +155,7 @@ export const login = async (req, res) => {
     const token = generateToken(user._id);
 
     // Enviar token en cookie HTTP-only
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('token', token, authCookieOptions);
 
     // Responder
     res.json({
@@ -184,7 +180,7 @@ export const login = async (req, res) => {
 // LOGOUT: Cerrar sesión
 export const logout = (req, res) => {
   // Limpiar la cookie del token
-  res.clearCookie('token');
+  res.clearCookie('token', clearAuthCookieOptions);
 
   res.json({
     success: true,

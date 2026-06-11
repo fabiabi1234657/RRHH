@@ -1,13 +1,13 @@
 ﻿# Backend — API REST de RRHH
 
-![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=node.js&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-24-339933?style=flat-square&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?style=flat-square&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?style=flat-square&logo=mongodb&logoColor=white)
 ![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20MFA-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Docs-Swagger%20UI-85EA2D?style=flat-square&logo=swagger&logoColor=black)
 
-API REST construida con Node.js 20 + Express 4 + MongoDB 7 (Mongoose 8). Expone todos los endpoints del sistema de Gestión de Recursos Humanos y se ejecuta dentro de Docker como parte del stack completo.
+API REST construida con Node.js 24 + Express 4 + MongoDB 7 (Mongoose 8). Expone todos los endpoints del sistema de Gestión de Recursos Humanos y se ejecuta dentro de Docker como parte del stack completo.
 
 ---
 
@@ -15,7 +15,7 @@ API REST construida con Node.js 20 + Express 4 + MongoDB 7 (Mongoose 8). Expone 
 
 | Paquete | Versión | Rol |
 |---------|---------|-----|
-| Node.js | 20 (alpine) | Entorno de ejecución |
+| Node.js | 24 (alpine) | Entorno de ejecución |
 | Express | 4 | Framework HTTP |
 | Mongoose | 8 | ODM para MongoDB |
 | jsonwebtoken | 9 | Autenticación JWT en cookie HTTP-only (7 días) |
@@ -32,7 +32,7 @@ API REST construida con Node.js 20 + Express 4 + MongoDB 7 (Mongoose 8). Expone 
 
 ```
 backend/
-├── server.js                   ← Punto de entrada, configura Express y rutas
+├── server.js                   ← Punto de entrada, conecta MongoDB y levanta el puerto
 ├── package.json
 ├── Dockerfile
 ├── .env.example
@@ -41,7 +41,10 @@ backend/
 │   └── seedAdmin.js            ← Solo crea el usuario administrador inicial
 └── src/
     ├── config/
+    │   ├── cors.js             ← Orígenes permitidos para frontend
+    │   ├── cookies.js          ← Opciones de cookie JWT
     │   ├── database.js         ← Conexión a MongoDB
+    │   ├── env.js              ← Carga de variables de entorno
     │   └── swagger.js          ← Configuración Swagger (tags, schemas, seguridad)
     ├── models/
     │   ├── User.js             ← Credenciales de acceso + MFA
@@ -87,10 +90,10 @@ MONGO_URI_TEST=mongodb://localhost:27017/rrhh_test
 JWT_SECRET=<cadena aleatoria de 64+ bytes>
 PORT=5000
 NODE_ENV=production
-FRONTEND_URL=http://localhost
+FRONTEND_URL=https://rrhh-frontend.onrender.com
 ```
 
-> En desarrollo local cambia `MONGO_URI` a `mongodb://localhost:27017/rrhh_db` y `FRONTEND_URL` a `http://localhost:5173`.
+> En desarrollo local cambia `MONGO_URI` a `mongodb://localhost:27017/rrhh_db`. CORS permite por defecto `http://localhost:5173` y `http://localhost:3000`; usa `FRONTEND_URL` solo para el dominio final desplegado en Render.
 
 ---
 
@@ -118,6 +121,7 @@ docker compose up -d backend
 
 El backend queda disponible en `http://localhost:5000`.
 Swagger UI: `http://localhost:5000/api-docs`
+Healthcheck: `http://localhost:5000/health`
 
 ---
 
@@ -138,7 +142,9 @@ Scripts disponibles:
 | `npm run dev` | Desarrollo con nodemon |
 | `npm run seed` | Seed completo (borra y recrea todo) |
 | `npm run seed:admin` | Solo crea el usuario admin |
+| `npm run lint` | Revisión ESLint del backend |
 | `npm test` | Suite de pruebas Jest |
+| `npm run test:coverage` | Pruebas con reporte de cobertura y umbral global 90% |
 
 ---
 
@@ -208,6 +214,12 @@ Scripts disponibles:
 | POST | `/mfa/setup` | Privado | Genera QR y secreto TOTP |
 | POST | `/mfa/verify` | Privado | Verifica código TOTP y activa MFA |
 | POST | `/mfa/disable` | Privado | Desactiva MFA |
+
+### Salud — `/health`
+
+| Método | Ruta | Acceso | Descripción |
+|--------|------|--------|-------------|
+| GET | `/health` | Público | Devuelve estado operativo del backend para Docker, Render o CI |
 
 ### Empleados — `/api/empleados`
 
