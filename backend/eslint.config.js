@@ -1,42 +1,33 @@
 import js from '@eslint/js';
+import globals from 'globals';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
-export default [
-  {
-    ignores: [
-      'coverage/**',
-      'node_modules/**',
-      '.npm-cache/**',
-      'dist/**',
-      'build/**'
-    ]
-  },
-  js.configs.recommended,
+export default defineConfig([
+  globalIgnores([
+    'coverage/**',
+    'uploads/**',
+    '.npm-cache/**',
+    'dist/**',
+    'build/**'
+  ]),
   {
     files: ['**/*.js'],
+    extends: [js.configs.recommended],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        Buffer: 'readonly',
-        console: 'readonly',
-        process: 'readonly',
-        afterAll: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        beforeEach: 'readonly',
-        describe: 'readonly',
-        expect: 'readonly',
-        jest: 'readonly',
-        test: 'readonly'
+        ...globals.node,
+        ...globals.jest
       }
     },
     rules: {
       'no-console': 'off',
-      'no-unused-vars': ['warn', {
+      'no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
         caughtErrorsIgnorePattern: '^_',
         varsIgnorePattern: '^_'
       }]
     }
   }
-];
+]);

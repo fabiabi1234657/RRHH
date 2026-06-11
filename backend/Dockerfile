@@ -10,8 +10,7 @@ RUN npm ci --omit=dev
 
 # Copiar el resto del código fuente
 COPY --chown=node:node . .
-
-RUN mkdir -p uploads && chown -R node:node /app
+RUN mkdir -p /app/uploads && chown -R node:node /app
 
 EXPOSE 5000
 
