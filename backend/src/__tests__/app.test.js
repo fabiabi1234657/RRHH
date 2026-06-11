@@ -25,6 +25,16 @@ describe('Aplicacion - healthcheck y CORS', () => {
     expect(response.headers['access-control-allow-credentials']).toBe('true');
   });
 
+  test('CORS permite origen configurado aunque llegue con slash final', async () => {
+    const response = await request(app)
+      .options('/api/auth/login')
+      .set('Origin', 'http://localhost:3000/')
+      .set('Access-Control-Request-Method', 'POST')
+      .expect(204);
+
+    expect(response.headers['access-control-allow-origin']).toBe('http://localhost:3000/');
+  });
+
   test('CORS no devuelve cabecera allow-origin para origen no permitido', async () => {
     const response = await request(app)
       .options('/api/auth/login')
