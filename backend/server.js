@@ -24,6 +24,25 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 // Crear la aplicación Express
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost',
+  'http://localhost:80',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_PRODUCTION_URL
+]
+  .map(origin => origin?.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'ok',
+    service: 'rrhh-backend',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // MIDDLEWARES - Estos procesos se ejecutan para TODAS las peticiones
 // 1. Parsear JSON del cuerpo de la petición
 app.use(express.json());
@@ -40,7 +59,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 // 4. Configurar CORS (para que el frontend pueda hacer peticiones)
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origen no permitido por CORS: ${origin}`));
+  },
   credentials: true // Permitir envío de cookies
 }));
 
