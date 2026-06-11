@@ -1,0 +1,75 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    name: Lint and test
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      JWT_SECRET: test-secret-for-ci-only
+      MONGO_URI_TEST: mongodb://127.0.0.1:27017/rrhh_test_ci
+      FRONTEND_URL: http://localhost:5173
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Lint backend
+        working-directory: backend
+        run: npm run lint
+
+      - name: Test backend with coverage
+        working-directory: backend
+        run: npm run test:coverage
+
+  deploy:
+    name: Production webhook
+    needs: quality
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      DEPLOY_WEBHOOK: ${{ secrets.PRODUCTION_DEPLOY_WEBHOOK }}
+
+    steps:
+      - name: Trigger production deploy
+        if: env.DEPLOY_WEBHOOK != ''
+        run: curl -fsS -X POST "$DEPLOY_WEBHOOK"

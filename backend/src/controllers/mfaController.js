@@ -165,7 +165,7 @@ export const verifyMfaLogin = async (req, res) => {
     let payload;
     try {
       payload = jwt.verify(mfaToken, process.env.JWT_SECRET);
-    } catch (_e) {
+    } catch {
       return res.status(401).json({ success: false, message: 'Token MFA inválido o expirado' });
     }
 
