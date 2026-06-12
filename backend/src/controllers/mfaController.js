@@ -2,6 +2,7 @@ import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { authCookieOptions } from '../config/cookies.js';
 
 const APP_NAME = 'CorpHR';
 
@@ -13,12 +14,7 @@ const generateSessionToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
 const setSessionCookie = (res, token) => {
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie('token', token, authCookieOptions);
 };
 
 // POST /api/auth/mfa/setup
@@ -165,7 +161,7 @@ export const verifyMfaLogin = async (req, res) => {
     let payload;
     try {
       payload = jwt.verify(mfaToken, process.env.JWT_SECRET);
-    } catch {
+    } catch (_e) {
       return res.status(401).json({ success: false, message: 'Token MFA inválido o expirado' });
     }
 

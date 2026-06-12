@@ -27,10 +27,7 @@ beforeAll(async () => {
   try {
     // Usar una BD separada para tests
     const testDbUri = process.env.MONGO_URI_TEST || 'mongodb://localhost:27017/rrhh_test';
-    await mongoose.connect(testDbUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect(testDbUri);
   } catch (error) {
     console.error('Error conectando a la BD de prueba:', error);
   }
@@ -130,6 +127,14 @@ describe('Autenticación - POST /api/auth/login', () => {
 });
 
 describe('Autenticacion - perfil, recuperacion y registro admin', () => {
+  test('GET /api/auth/profile sin token devuelve 401', async () => {
+    const response = await request(app)
+      .get('/api/auth/profile')
+      .expect(401);
+
+    expect(response.body.success).toBe(false);
+  });
+
   test('PUT /api/auth/profile actualiza nombre del usuario autenticado', async () => {
     const agent = request.agent(app);
 
@@ -168,6 +173,35 @@ describe('Autenticacion - perfil, recuperacion y registro admin', () => {
     expect(response.body.success).toBe(true);
   });
 
+  test('POST /api/auth/logout elimina la cookie de sesion', async () => {
+    const agent = request.agent(app);
+
+    await agent
+      .post('/api/auth/register')
+      .send({
+        name: 'Juan Perez',
+        email: 'juan@example.com',
+        password: 'Password123'
+      })
+      .expect(201);
+
+    await agent
+      .post('/api/auth/login')
+      .send({
+        email: 'juan@example.com',
+        password: 'Password123'
+      })
+      .expect(200);
+
+    const response = await agent
+      .post('/api/auth/logout')
+      .expect(200);
+
+    expect(response.body.success).toBe(true);
+    expect(response.headers['set-cookie'][0]).toContain('token=');
+    expect(response.headers['set-cookie'][0]).toContain('Expires=Thu, 01 Jan 1970');
+  });
+
   test('POST /api/auth/register-admin permite crear admin solo con rol admin', async () => {
     const agent = request.agent(app);
 
@@ -197,5 +231,36 @@ describe('Autenticacion - perfil, recuperacion y registro admin', () => {
       .expect(201);
 
     expect(response.body.user.role).toBe('admin');
+  });
+
+  test('POST /api/auth/register-admin con rol employee devuelve 403', async () => {
+    const agent = request.agent(app);
+
+    await User.create({
+      name: 'Empleado',
+      email: 'employee@example.com',
+      password: 'Password123',
+      role: 'employee'
+    });
+
+    await agent
+      .post('/api/auth/login')
+      .send({
+        email: 'employee@example.com',
+        password: 'Password123'
+      })
+      .expect(200);
+
+    const response = await agent
+      .post('/api/auth/register-admin')
+      .send({
+        name: 'Usuario Bloqueado',
+        email: 'bloqueado@example.com',
+        password: 'Password123',
+        role: 'admin'
+      })
+      .expect(403);
+
+    expect(response.body.success).toBe(false);
   });
 });

@@ -1,17 +1,10 @@
 export default {
   testEnvironment: 'node',
   testMatch: ['**/__tests__/**/*.test.js'],
-  setupFiles: ['<rootDir>/jest.setup.js'],
   collectCoverageFrom: [
-    'src/routes/authRoutes.js',
-    'src/routes/attendanceRoutes.js',
-    'src/routes/reportRoutes.js',
-    'src/middlewares/**/*.js',
-    'src/models/User.js',
-    'src/models/Employee.js',
-    'src/models/Department.js',
-    'src/models/Position.js',
-    'src/models/Attendance.js'
+    'src/**/*.js',
+    '!src/config/**',
+    '!src/__tests__/**'
   ],
   coverageThreshold: {
     global: {

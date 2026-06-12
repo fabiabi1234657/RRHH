@@ -9,9 +9,6 @@ node_modules/
 # Builds
 dist/
 build/
-coverage/
-backend/coverage/
-frontend/coverage/
 
 # Uploads (archivos subidos en runtime)
 backend/uploads/
@@ -28,6 +25,3 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
-
-# Obsidian vault local para sustentacion
-Boveda_Obsidian_RRHH/

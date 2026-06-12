@@ -11,7 +11,7 @@
     "seed:admin": "node scripts/seedAdmin.js",
     "lint": "eslint .",
     "test": "jest --runInBand",
-    "test:coverage": "jest --runInBand --coverage"
+    "test:coverage": "jest --coverage --runInBand"
   },
   "keywords": [
     "express",

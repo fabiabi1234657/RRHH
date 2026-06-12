@@ -65,7 +65,7 @@ export const subirDocumento = async (req, res) => {
     const employee = await Employee.findById(employeeId);
     if (!employee) {
       // Limpiar archivo huérfano
-      try { fs.unlinkSync(req.file.path); } catch { /* noop */ }
+      try { fs.unlinkSync(req.file.path); } catch (_e) { /* noop */ }
       return res.status(404).json({ success: false, message: 'Empleado no encontrado' });
     }
 
@@ -162,7 +162,7 @@ export const eliminarDocumento = async (req, res) => {
 
     const filePath = path.join(uploadDir, doc.storedName);
     if (fs.existsSync(filePath)) {
-      try { fs.unlinkSync(filePath); } catch { /* noop */ }
+      try { fs.unlinkSync(filePath); } catch (_e) { /* noop */ }
     }
     await doc.deleteOne();
 
