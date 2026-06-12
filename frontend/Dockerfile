@@ -1,4 +1,4 @@
-# Etapa 1: build de React
+# Etapa 1: build de React (node:24)
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
@@ -6,12 +6,9 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Etapa 2: servidor con react-router-serve
-FROM node:24-alpine AS runner
-WORKDIR /app
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/package*.json ./
-RUN npm ci --omit=dev
-USER node
-EXPOSE 3000
-CMD ["npx", "react-router", "serve", "--port", "3000", "dist"]
+# Etapa 2: servir con nginx (no necesita node)
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
