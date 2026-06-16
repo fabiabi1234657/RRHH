@@ -6,7 +6,7 @@ services:
   # 1. Servicio Web para el Backend (API REST)
   - type: web
     name: rrhh-backend
-    env: node
+    runtime: node
     plan: free # Usa el plan gratuito de Render. Cambia a "starter" o superior si necesitas más recursos o discos persistentes.
     rootDir: backend
     buildCommand: npm install
@@ -30,11 +30,12 @@ services:
         value: Password123
 
   # 2. Sitio Estático para el Frontend (SPA React/Vite)
-  - type: static
+  - type: web
     name: rrhh-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     headers:
       - path: /*
         name: Cache-Control
