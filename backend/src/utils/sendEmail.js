@@ -1,36 +1,44 @@
 import nodemailer from 'nodemailer';
 
-const TIMEOUT_MS = 10_000; // 10 segundos
+const TIMEOUT_MS = 10_000;
 
 const sendEmail = async (options) => {
-  // Configurar el transportador (SMTP)
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    },
-    connectionTimeout: TIMEOUT_MS,
-    greetingTimeout: TIMEOUT_MS,
-    socketTimeout: TIMEOUT_MS,
-  });
+  // Si no hay credenciales SMTP, devolver éxito (log silencioso en producción)
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('[EMAIL] Credenciales SMTP no configuradas. Email no enviado para:', options.email);
+    return Promise.resolve(); // No bloquear el flujo
+  }
 
-  // Definir las opciones del correo
-  const message = {
-    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
-    to: options.email,
-    subject: options.subject,
-    text: options.message
-  };
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: process.env.SMTP_PORT === '465', // true para puerto 465, false para 587
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      },
+      connectionTimeout: TIMEOUT_MS,
+      socketTimeout: TIMEOUT_MS,
+    });
 
-  // Enviar el correo con timeout manual como respaldo
-  const envio = transporter.sendMail(message);
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Tiempo de espera agotado al enviar el correo (10s)')), TIMEOUT_MS)
-  );
+    const message = {
+      from: `${process.env.FROM_NAME || 'CorpHR'} <${process.env.FROM_EMAIL || 'noreply@corphr.com'}>`,
+      to: options.email,
+      subject: options.subject,
+      text: options.message
+    };
 
-  await Promise.race([envio, timeout]);
+    const envio = transporter.sendMail(message);
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('SMTP timeout (10s)')), TIMEOUT_MS)
+    );
+
+    await Promise.race([envio, timeout]);
+  } catch (error) {
+    console.error('[EMAIL] Error enviando correo:', error.message);
+    // No relanzar error — permitir que el flujo continúe
+  }
 };
 
 export default sendEmail;

@@ -1,17 +1,6 @@
-version: '3.9'
+
 
 services:
-  mongo:
-    image: mongo:7
-    container_name: rrhh_mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: rrhh_db
-
   backend:
     build:
       context: ./backend
@@ -20,13 +9,10 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
-    depends_on:
-      - mongo
     environment:
-      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017/rrhh_db}
       PORT: 5000
       NODE_ENV: production
-      FRONTEND_URL: ${FRONTEND_URL:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
     env_file:
       - ./backend/.env
     volumes:
@@ -44,5 +30,4 @@ services:
       - backend
 
 volumes:
-  mongo_data:
   backend_uploads:
