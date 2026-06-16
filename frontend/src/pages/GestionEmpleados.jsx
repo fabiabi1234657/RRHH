@@ -6,6 +6,7 @@ import {
   eliminarEmpleadoAPI,
   obtenerDepartamentosAPI,
   obtenerPosicionesAPI,
+  obtenerUsuariosAPI,
 } from '../services/api';
 import Modal      from '../components/ui/Modal';
 import Button     from '../components/ui/Button';
@@ -70,7 +71,7 @@ const iniciales = nombre => {
 /* ============================================================
    Formulario crear / editar empleado
    ============================================================ */
-function FormEmpleado({ inicial, departamentos, posiciones, guardando, error, onGuardar, onCerrarError }) {
+function FormEmpleado({ inicial, departamentos, posiciones, usuarios, guardando, error, onGuardar, onCerrarError }) {
   const [form, setForm] = useState({
     userId: '',
     position: '',
@@ -97,12 +98,18 @@ function FormEmpleado({ inicial, departamentos, posiciones, guardando, error, on
 
       {!inicial?._id && (
         <div className="field">
-          <label className="field__label" htmlFor="ef-userId">ID de usuario *</label>
-          <input
-            id="ef-userId" name="userId" className="field__input"
-            placeholder="ObjectId del usuario registrado"
+          <label className="field__label" htmlFor="ef-userId">Usuario *</label>
+          <select
+            id="ef-userId" name="userId" className="field__input field__select"
             value={form.userId} onChange={cambiar} required
-          />
+          >
+            <option value="">- Selecciona un usuario -</option>
+            {usuarios.map(u => (
+              <option key={u.id} value={u.id}>
+                {u.email}{u.name ? ` — ${u.name}` : ''}
+              </option>
+            ))}
+          </select>
           <span className="field__hint">El usuario debe estar registrado en el sistema</span>
         </div>
       )}
@@ -191,6 +198,7 @@ export default function GestionEmpleados() {
   const [empleados, setEmpleados]         = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [posiciones, setPosiciones]       = useState([]);
+  const [usuarios, setUsuarios]           = useState([]);
   const [cargando, setCargando]           = useState(true);
   const [error, setError]                 = useState(null);
   const [busqueda, setBusqueda]           = useState('');
@@ -207,14 +215,16 @@ export default function GestionEmpleados() {
   const cargar = useCallback(async () => {
     setCargando(true); setError(null);
     try {
-      const [rEmp, rDept, rPos] = await Promise.all([
+      const [rEmp, rDept, rPos, rUsers] = await Promise.all([
         obtenerEmpleadosAPI(),
         obtenerDepartamentosAPI(),
         obtenerPosicionesAPI(),
+        obtenerUsuariosAPI(),
       ]);
       setEmpleados(rEmp.employees ?? rEmp ?? []);
       setDepartamentos(rDept.departments ?? []);
       setPosiciones(rPos.positions ?? []);
+      setUsuarios(rUsers.users ?? []);
     } catch (e) {
       setError(e.message ?? 'Error al cargar datos');
     } finally {
@@ -482,6 +492,7 @@ export default function GestionEmpleados() {
           <FormEmpleado
             departamentos={departamentos}
             posiciones={posiciones}
+            usuarios={usuarios}
             guardando={guardando}
             error={errorAccion}
             onGuardar={crearEmpleado}

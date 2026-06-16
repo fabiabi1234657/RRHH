@@ -54,7 +54,7 @@ Render cuenta con la función **Blueprints**, que lee el archivo `render.yaml` y
    - **MONGO_URI (backend):** Pega la cadena de conexión de MongoDB Atlas que copiaste en el Paso 1.
    - **JWT_SECRET (backend):** Déjalo en blanco; Render generará un secreto seguro y aleatorio automáticamente.
    - **FRONTEND_URL (backend):** Puedes dejarlo en blanco temporalmente o escribir la URL prevista del frontend (ej: `https://rrhh-frontend.onrender.com`).
-   - **VITE_API_URL (frontend):** Escribe la URL de tu backend en Render. Por defecto será: `https://rrhh-backend.onrender.com` (o el nombre que hayas elegido para el servicio backend).
+   - **VITE_API_URL (frontend):** Escribe la URL de tu backend en Render agregando `/api` al final. Por defecto será: `https://rrhh-backend.onrender.com/api` (o el nombre que hayas elegido para el servicio backend con `/api` al final).
 5. Haz clic en **Apply**.
 
 Render comenzará a construir y desplegar ambos servicios de forma paralela.

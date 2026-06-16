@@ -6,7 +6,9 @@ import {
   logout,
   getProfile,
   updateProfile,
-  recoverPassword
+  recoverPassword,
+  resetPassword,
+  getUsers
 } from '../controllers/authController.js';
 import {
   setupMfa,
@@ -99,6 +101,7 @@ router.post('/register-admin', protect, authorize('admin'), registerByAdmin);
  */
 router.post('/login', login);
 router.post('/recover', recoverPassword);
+router.put('/reset-password/:token', resetPassword);
 
 /**
  * @swagger
@@ -161,6 +164,7 @@ router.post('/logout', logout);
  */
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
+router.get('/users', protect, authorize('admin'), getUsers);
 
 // === MFA / TOTP ===
 router.post('/mfa/setup', protect, setupMfa);

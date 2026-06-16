@@ -67,11 +67,17 @@ export const logoutAPI = () =>
 export const obtenerPerfilAPI = () =>
   peticion('GET', '/auth/profile');
 
+export const obtenerUsuariosAPI = () =>
+  peticion('GET', '/auth/users');
+
 export const actualizarPerfilAPI = (datos) =>
   peticion('PUT', '/auth/profile', datos);
 
 export const recuperarContrasenaAPI = (email) =>
   peticion('POST', '/auth/recover', { email });
+
+export const restablecerContrasenaAPI = (token, password) =>
+  peticion('PUT', `/auth/reset-password/${token}`, { password });
 
 /* ASISTENCIA */
 export const registrarEntradaAPI = (datos = {}) =>

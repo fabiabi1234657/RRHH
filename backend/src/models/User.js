@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
+import crypto from 'crypto';
 
 // Definir el esquema (estructura) del usuario
 const userSchema = new mongoose.Schema(
@@ -40,7 +41,9 @@ const userSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
   }
 );
 
@@ -66,6 +69,23 @@ userSchema.pre('save', async function(next) {
 // Método: comparar contraseña ingresada con la encriptada en la BD
 userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcryptjs.compare(enteredPassword, this.password);
+};
+
+// Método para generar token de recuperación (sha256)
+userSchema.methods.getResetPasswordToken = function() {
+  // Generar token aleatorio
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hashear token y guardarlo en el campo de la BD
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Establecer expiración (1 hora)
+  this.resetPasswordExpire = Date.now() + 60 * 60 * 1000;
+
+  return resetToken;
 };
 
 // Crear el modelo (tabla) con el esquema definido

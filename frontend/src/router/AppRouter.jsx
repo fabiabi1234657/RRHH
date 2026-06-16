@@ -24,6 +24,7 @@ import Layout from '../components/layout/Layout';
 import Home            from '../pages/Home';
 import Login           from '../pages/Login';
 import RecoverPassword from '../pages/RecoverPassword';
+import ResetPassword   from '../pages/ResetPassword';
 
 /* Páginas del administrador — lazy loaded (solo se descargan al navegar) */
 const Dashboard      = lazy(() => import('../pages/Dashboard'));
@@ -97,6 +98,9 @@ export default function AppRouter() {
         } />
         <Route path="/recuperar-contrasena" element={
           <PublicRoute><RecoverPassword /></PublicRoute>
+        } />
+        <Route path="/reset-password/:token" element={
+          <PublicRoute><ResetPassword /></PublicRoute>
         } />
         <Route path="/register" element={
           <PublicRoute><Suspense fallback={<PageLoader />}><Register /></Suspense></PublicRoute>

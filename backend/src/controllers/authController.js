@@ -1,5 +1,7 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import sendEmail from '../utils/sendEmail.js';
 import { buildMfaPendingResponse } from './mfaController.js';
 import { authCookieOptions, clearAuthCookieOptions } from '../config/cookies.js';
 
@@ -275,19 +277,129 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// RECOVER: respuesta controlada sin revelar si el email existe
+// RECOVER: genera token y envia correo
 export const recoverPassword = async (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  if (!email) {
-    return res.status(400).json({
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Por favor ingresa tu correo electronico'
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    // Por seguridad, no revelamos si el usuario existe
+    if (!user) {
+      return res.json({
+        success: true,
+        message: 'Si el correo esta registrado, recibiras instrucciones de recuperacion'
+      });
+    }
+
+    // Obtener token de reset
+    const resetToken = user.getResetPasswordToken();
+
+    // Guardar token en la BD (sin validación de otros campos)
+    await user.save({ validateBeforeSave: false });
+
+    // Crear URL de reset
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    const message = `Has solicitado restablecer tu contraseña. Por favor, haz clic en el siguiente enlace:\n\n${resetUrl}\n\nSi no solicitaste esto, ignora este correo.`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Recuperación de contraseña - CorpHR',
+        message
+      });
+
+      res.json({
+        success: true,
+        message: 'Si el correo esta registrado, recibiras instrucciones de recuperacion'
+      });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(500).json({
+        success: false,
+        message: 'No se pudo enviar el correo',
+        error: error.message
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: 'Por favor ingresa tu correo electronico'
+      message: 'Error en la recuperacion',
+      error: error.message
     });
   }
+};
 
-  return res.json({
-    success: true,
-    message: 'Si el correo esta registrado, recibiras instrucciones de recuperacion'
-  });
+// GET USERS: listar todos los usuarios (solo admin)
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('_id name email role').sort({ name: 1 });
+    return res.json({
+      success: true,
+      users: users.map(u => ({
+        id: u._id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+      })),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error al obtener usuarios',
+      error: error.message,
+    });
+  }
+};
+
+// RESET PASSWORD: valida token y cambia contrasena
+export const resetPassword = async (req, res) => {
+  try {
+    // Obtener token hasheado
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'El token es invalido o ha expirado'
+      });
+    }
+
+    // Establecer nueva contraseña
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Contraseña restablecida correctamente'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al restablecer la contraseña',
+      error: error.message
+    });
+  }
 };

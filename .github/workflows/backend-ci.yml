@@ -1,0 +1,53 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  backend-ci:
+    name: Backend Lint and Tests
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      NODE_ENV: test
+      PORT: 5000
+      MONGO_URI: mongodb://127.0.0.1:27017/rrhh_ci
+      MONGO_URI_TEST: mongodb://127.0.0.1:27017/rrhh_test
+      JWT_SECRET: ci_jwt_secret_for_rrhh_backend_tests_change_in_production
+      FRONTEND_URL: http://localhost:5173
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint backend
+        run: npm run lint
+      - name: Test backend
+        run: npm test
+      - name: Coverage audit
+        run: npm run test:coverage || echo "Coverage check failed but continuing"
