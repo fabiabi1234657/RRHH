@@ -167,7 +167,13 @@ export const subirDocumentoEmpleadoAPI = async (employeeId, formData) => {
   }
 };
 
-export const descargarDocumentoURL = (documentId) => `/api/documents/${documentId}`;
+export const descargarDocumentoURL = (documentId) => {
+  const apiBase = import.meta.env.VITE_API_URL || '';
+  if (apiBase) {
+    return `${apiBase}/documents/${documentId}`;
+  }
+  return `/api/documents/${documentId}`;
+};
 
 export const eliminarDocumentoAPI = (documentId) =>
   peticion('DELETE', `/documents/${documentId}`);

@@ -1,0 +1,49 @@
+# Blueprint de Render para el proyecto RRHH
+# Este archivo permite desplegar todo el stack de servicios con un solo clic utilizando Render Blueprints.
+# Ver la guía completa en DEPLOY_RENDER.md para instrucciones paso a paso.
+
+services:
+  # 1. Servicio Web para el Backend (API REST)
+  - type: web
+    name: rrhh-backend
+    env: node
+    plan: free # Usa el plan gratuito de Render. Cambia a "starter" o superior si necesitas más recursos o discos persistentes.
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false # Render solicitará esta variable (por ejemplo, de MongoDB Atlas) al desplegar.
+      - key: JWT_SECRET
+        generateValue: true # Render generará automáticamente un secreto aleatorio seguro de 256 bits.
+      - key: FRONTEND_URL
+        sync: false # URL del frontend. Ejemplo: https://rrhh-frontend.onrender.com
+      - key: SEED_PASSWORD
+        value: Password123
+      - key: ADMIN_EMAIL
+        value: admin@rrhh.com
+      - key: ADMIN_PASS
+        value: Password123
+
+  # 2. Sitio Estático para el Frontend (SPA React/Vite)
+  - type: static
+    name: rrhh-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+    routes:
+      # Regla de redirección (Rewrite) para manejar SPA y que React Router funcione al recargar
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false # URL del backend. Ejemplo: https://rrhh-backend.onrender.com
