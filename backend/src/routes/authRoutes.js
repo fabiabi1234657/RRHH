@@ -166,6 +166,23 @@ router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
 router.get('/users', protect, authorize('admin'), getUsers);
 
+// === DIAGNOSTICO (solo admin) ===
+router.get('/diagnostic', protect, authorize('admin'), (_req, res) => {
+  res.json({
+    success: true,
+    smtp: {
+      host: process.env.SMTP_HOST ? '✓ configurado' : '❌ falta',
+      port: process.env.SMTP_PORT ? `✓ ${process.env.SMTP_PORT}` : '❌ falta',
+      user: process.env.SMTP_USER ? '✓ configurado' : '❌ falta',
+      pass: process.env.SMTP_PASS ? '✓ configurado' : '❌ falta',
+      from_name: process.env.FROM_NAME || 'CorpHR',
+      from_email: process.env.FROM_EMAIL || 'noreply@corphr.com',
+    },
+    frontend_url: process.env.FRONTEND_URL || 'no configurado',
+    node_env: process.env.NODE_ENV,
+  });
+});
+
 // === MFA / TOTP ===
 router.post('/mfa/setup', protect, setupMfa);
 router.post('/mfa/enable', protect, enableMfa);
