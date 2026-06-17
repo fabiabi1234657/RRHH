@@ -5,13 +5,13 @@ const TIMEOUT_MS = 10_000;
 const createTransportOptions = (port) => ({
   host: process.env.SMTP_HOST,
   port,
-  secure: port === 465,
+  secure: port === 465, // true para 465, false para otros
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS.trim()
   },
-  requireTLS: port !== 465,
   tls: {
+    // No fallar si el certificado es auto-firmado (común en nodos de nube)
     rejectUnauthorized: false
   },
   connectionTimeout: TIMEOUT_MS,
